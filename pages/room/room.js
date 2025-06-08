@@ -12,7 +12,7 @@ Page({
     inputScore: '',
     quickScores: [100, 200, 500, 1000, -100, -200, -500, -1000],
     showShareModal: false,
-    qrSize: 280,
+    qrSize: 220,
     showEditModal: false,
     editNickName: '',
     editAvatarUrl: ''
