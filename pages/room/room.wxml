@@ -102,13 +102,10 @@
     <view class="share-content">
       <!-- 房间信息卡片 -->
       <view class="room-info-card">
-        <view class="room-card-header">
-          <text class="room-card-name">{{roomInfo.name}}</text>
-        </view>
         <view class="room-card-details">
-          <view class="room-detail-item">
-            <text class="detail-label">游戏类型</text>
-            <text class="detail-value">{{roomInfo.gameType}}</text>
+          <view class="room-detail-item room-name-item">
+            <text class="detail-label">房间名称</text>
+            <text class="detail-value">{{roomInfo.name}}</text>
           </view>
           <view class="room-detail-item">
             <text class="detail-label">当前人数</text>
