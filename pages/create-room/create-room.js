@@ -126,7 +126,7 @@ Page({
         isHost: true,
         playerId: this.generatePlayerId()
       }],
-      createdAt: new Date().getTime()
+      createTime: new Date().getTime()
     }
 
     console.log('创建房间:', roomData)

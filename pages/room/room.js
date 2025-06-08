@@ -15,7 +15,9 @@ Page({
     qrSize: 200,
     showEditModal: false,
     editNickName: '',
-    editAvatarUrl: ''
+    editAvatarUrl: '',
+    gameTimer: '00:00:00',
+    timerInterval: null
   },
 
   onLoad(options) {
@@ -90,6 +92,9 @@ Page({
 
     // 加载计分历史
     this.loadScoreHistory(roomId)
+    
+    // 启动游戏计时器
+    this.startGameTimer(roomInfo.createTime)
   },
 
   joinRoom(roomInfo) {
@@ -383,9 +388,6 @@ Page({
       // 绘制装饰性二维码样式
       this.drawDecorativeQRCode(ctx, text, size)
       
-      // 绘制房间信息
-      this.drawRoomInfoOnQR(ctx, size)
-      
       // 执行绘制
       ctx.draw(false, () => {
         console.log('二维码绘制完成')
@@ -559,34 +561,6 @@ Page({
     ctx.setTextAlign('center')
     ctx.setTextBaseline('middle')
     ctx.fillText('棋牌', centerX, centerY)
-  },
-
-  // 在二维码上绘制房间信息
-  drawRoomInfoOnQR(ctx, size) {
-    // 绘制底部信息区域
-    const infoHeight = 60
-    const infoY = size - infoHeight
-    
-    // 绘制半透明背景
-    ctx.setFillStyle('rgba(255, 255, 255, 0.95)')
-    ctx.fillRect(0, infoY, size, infoHeight)
-    
-    // 绘制房间名称
-    ctx.setFillStyle('#2d3748')
-    ctx.setFontSize(14)
-    ctx.setTextAlign('center')
-    ctx.setTextBaseline('top')
-    ctx.fillText(this.data.roomInfo.name, size / 2, infoY + 8)
-    
-    // 绘制游戏类型
-    ctx.setFillStyle('#667eea')
-    ctx.setFontSize(12)
-    ctx.fillText(this.data.roomInfo.gameType, size / 2, infoY + 28)
-    
-    // 绘制扫码提示
-    ctx.setFillStyle('#718096')
-    ctx.setFontSize(10)
-    ctx.fillText('扫码加入房间', size / 2, infoY + 45)
   },
 
   exitRoom() {
@@ -780,6 +754,51 @@ Page({
       title: `${this.data.roomInfo.name} - 棋牌计分器`,
       query: `roomId=${this.data.roomInfo.roomId}&isHost=false`,
       imageUrl: '' // 可以添加分享图片
+    }
+  },
+
+  // 启动游戏计时器
+  startGameTimer(createTime) {
+    // 清除之前的计时器
+    if (this.data.timerInterval) {
+      clearInterval(this.data.timerInterval)
+    }
+    
+    const startTime = new Date(createTime).getTime()
+    
+    // 立即更新一次
+    this.updateTimer(startTime)
+    
+    // 设置定时器每秒更新
+    const interval = setInterval(() => {
+      this.updateTimer(startTime)
+    }, 1000)
+    
+    this.setData({
+      timerInterval: interval
+    })
+  },
+
+  // 更新计时器显示
+  updateTimer(startTime) {
+    const now = Date.now()
+    const duration = Math.floor((now - startTime) / 1000) // 转换为秒
+    
+    const hours = Math.floor(duration / 3600)
+    const minutes = Math.floor((duration % 3600) / 60)
+    const seconds = duration % 60
+    
+    const timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+    
+    this.setData({
+      gameTimer: timeStr
+    })
+  },
+
+  // 页面卸载时清理计时器
+  onUnload() {
+    if (this.data.timerInterval) {
+      clearInterval(this.data.timerInterval)
     }
   },
 })
