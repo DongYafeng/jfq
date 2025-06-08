@@ -31,13 +31,13 @@
         bindtap="selectPlayer"
         data-player="{{item}}"
       >
+        <view wx:if="{{item.isHost}}" class="host-badge">房主</view>
         <view class="player-avatar-container">
           <image class="player-avatar" src="{{item.avatarUrl || '/images/default-avatar.svg'}}" />
         </view>
         <view class="player-info">
           <view class="player-name-row">
             <text class="player-name">{{item.nickName}}</text>
-            <view wx:if="{{item.isHost}}" class="host-badge">房主</view>
           </view>
           <view class="score-container">
             <text class="score-label">分数</text>
