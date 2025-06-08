@@ -140,23 +140,13 @@
             </view>
           </view>
         </view>
-        <view class="qr-actions">
-          <button class="qr-action-btn" bindtap="saveQRCode">
-            <text class="action-icon">💾</text>
-            <text class="action-text">保存图片</text>
-          </button>
-          <button class="qr-action-btn" bindtap="shareToFriend">
-            <text class="action-icon">📤</text>
-            <text class="action-text">微信分享</text>
-          </button>
-        </view>
       </view>
 
       <!-- 分享提示 -->
       <view class="share-tips">
         <view class="tip-item">
-          <text class="tip-icon">💡</text>
-          <text class="tip-text">二维码24小时内有效</text>
+          <text class="tip-icon">⏰</text>
+          <text class="tip-text">二维码3分钟内有效</text>
         </view>
         <view class="tip-item">
           <text class="tip-icon">👥</text>

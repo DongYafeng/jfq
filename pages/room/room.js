@@ -318,7 +318,7 @@ Page({
     // 延迟生成二维码，等待DOM渲染完成
     setTimeout(() => {
       this.generateQRCode()
-    }, 100)
+    }, 300)
   },
 
   closeShareModal() {
@@ -329,6 +329,8 @@ Page({
 
   // 生成小程序码（真正的二维码）
   generateQRCode() {
+    console.log('开始生成二维码...')
+    
     // 生成小程序路径，包含房间参数
     const miniProgramPath = `pages/room/room?roomId=${this.data.roomInfo.roomId}&isHost=false`
     
@@ -339,12 +341,13 @@ Page({
       name: this.data.roomInfo.name,
       gameType: this.data.roomInfo.gameType,
       path: miniProgramPath,
-      appId: 'your-app-id', // 实际项目中替换为真实的小程序AppID
+      appId: 'chess-score-app',
       timestamp: Date.now()
     }
     
     // 生成包含房间信息的JSON字符串
     const qrData = JSON.stringify(roomData)
+    console.log('二维码数据:', qrData)
     
     // 生成二维码
     this.generateQRCodeCanvas(qrData)
@@ -352,35 +355,57 @@ Page({
 
   // 生成二维码画布
   generateQRCodeCanvas(data) {
-    const ctx = wx.createCanvasContext('qrcode')
-    const size = this.data.qrSize
+    console.log('开始绘制二维码画布...')
     
-    // 清空画布
-    ctx.clearRect(0, 0, size, size)
-    
-    // 绘制白色背景
-    ctx.setFillStyle('#ffffff')
-    ctx.fillRect(0, 0, size, size)
-    
-    // 绘制边框
-    ctx.setStrokeStyle('#e2e8f0')
-    ctx.setLineWidth(2)
-    ctx.strokeRect(1, 1, size - 2, size - 2)
-    
-    // 生成更标准的二维码
-    this.drawStandardQRCode(ctx, data, size)
-    
-    ctx.draw()
+    try {
+      const ctx = wx.createCanvasContext('qrcode')
+      const size = this.data.qrSize
+      
+      if (!ctx) {
+        console.error('无法创建Canvas上下文')
+        return
+      }
+      
+      // 清空画布
+      ctx.clearRect(0, 0, size, size)
+      
+      // 绘制白色背景
+      ctx.setFillStyle('#ffffff')
+      ctx.fillRect(0, 0, size, size)
+      
+      // 绘制边框
+      ctx.setStrokeStyle('#e2e8f0')
+      ctx.setLineWidth(2)
+      ctx.strokeRect(1, 1, size - 2, size - 2)
+      
+      // 生成更标准的二维码
+      this.drawStandardQRCode(ctx, data, size)
+      
+      // 执行绘制
+      ctx.draw(false, () => {
+        console.log('二维码绘制完成')
+      })
+    } catch (error) {
+      console.error('二维码生成失败:', error)
+      wx.showToast({
+        title: '二维码生成失败',
+        icon: 'error'
+      })
+    }
   },
 
   // 绘制标准二维码
   drawStandardQRCode(ctx, data, size) {
-    const gridSize = 25 // 增加网格密度
+    console.log('开始绘制二维码内容...')
+    
+    const gridSize = 21 // 标准二维码网格大小
     const margin = 20 // 边距
     const qrSize = size - margin * 2
     const cellSize = Math.floor(qrSize / gridSize)
     const startX = (size - gridSize * cellSize) / 2
     const startY = (size - gridSize * cellSize) / 2
+    
+    console.log(`网格参数: gridSize=${gridSize}, cellSize=${cellSize}, startX=${startX}, startY=${startY}`)
     
     // 生成基于数据的二维码模式
     const pattern = this.generateStandardQRPattern(data, gridSize)
@@ -392,26 +417,18 @@ Page({
     this.drawPositionMarker(ctx, startX + (gridSize - 7) * cellSize, startY, cellSize)
     this.drawPositionMarker(ctx, startX, startY + (gridSize - 7) * cellSize, cellSize)
     
-    // 绘制对齐标记（中心）
-    const centerX = startX + Math.floor(gridSize / 2) * cellSize
-    const centerY = startY + Math.floor(gridSize / 2) * cellSize
-    this.drawAlignmentMarker(ctx, centerX - 2 * cellSize, centerY - 2 * cellSize, cellSize)
-    
-    // 绘制时序标记（垂直和水平线）
-    this.drawTimingPatterns(ctx, startX, startY, cellSize, gridSize)
-    
     // 绘制数据模式
     for (let i = 0; i < gridSize; i++) {
       for (let j = 0; j < gridSize; j++) {
-        // 跳过功能区域
-        if (this.isFunctionArea(i, j, gridSize)) continue
+        // 跳过定位标记区域
+        if (this.isPositionMarkerArea(i, j, gridSize)) continue
         
         if (pattern[i][j]) {
           ctx.fillRect(
             startX + j * cellSize,
             startY + i * cellSize,
-            cellSize - 0.5,
-            cellSize - 0.5
+            cellSize - 1,
+            cellSize - 1
           )
         }
       }
@@ -419,88 +436,48 @@ Page({
     
     // 绘制房间信息
     this.drawRoomInfo(ctx, size)
+    
+    console.log('二维码内容绘制完成')
   },
 
   // 生成标准二维码模式
   generateStandardQRPattern(data, size) {
     const pattern = []
     
-    // 使用更复杂的哈希算法
-    let hash = this.calculateHash(data)
+    // 使用简化的哈希算法
+    let hash = this.calculateSimpleHash(data)
     
     // 生成数据模式
     for (let i = 0; i < size; i++) {
       pattern[i] = []
       for (let j = 0; j < size; j++) {
         // 基于位置和数据生成模式
-        const seed = hash + i * 31 + j * 17
-        const value = (seed ^ (seed >> 16)) & 0xFFFF
-        pattern[i][j] = (value % 100) < 45 // 约45%的填充率
+        const seed = hash + i * 17 + j * 13
+        pattern[i][j] = (seed % 100) < 50 // 50%的填充率
       }
     }
     
     return pattern
   },
 
-  // 计算数据哈希值
-  calculateHash(data) {
+  // 简化的哈希计算
+  calculateSimpleHash(data) {
     let hash = 0
     for (let i = 0; i < data.length; i++) {
       const char = data.charCodeAt(i)
-      hash = ((hash << 5) - hash) + char
-      hash = hash & hash // 转换为32位整数
+      hash = ((hash << 3) - hash + char) & 0xFFFF
     }
     return Math.abs(hash)
   },
 
-  // 绘制对齐标记
-  drawAlignmentMarker(ctx, x, y, cellSize) {
-    // 5x5 对齐标记
-    ctx.fillRect(x, y, 5 * cellSize, 5 * cellSize)
-    ctx.setFillStyle('#ffffff')
-    ctx.fillRect(x + cellSize, y + cellSize, 3 * cellSize, 3 * cellSize)
-    ctx.setFillStyle('#000000')
-    ctx.fillRect(x + 2 * cellSize, y + 2 * cellSize, cellSize, cellSize)
-  },
-
-  // 绘制时序标记
-  drawTimingPatterns(ctx, startX, startY, cellSize, gridSize) {
-    // 水平时序线
-    for (let i = 8; i < gridSize - 8; i++) {
-      if (i % 2 === 0) {
-        ctx.fillRect(startX + i * cellSize, startY + 6 * cellSize, cellSize, cellSize)
-      }
-    }
-    
-    // 垂直时序线
-    for (let i = 8; i < gridSize - 8; i++) {
-      if (i % 2 === 0) {
-        ctx.fillRect(startX + 6 * cellSize, startY + i * cellSize, cellSize, cellSize)
-      }
-    }
-  },
-
-  // 检查是否为功能区域
-  isFunctionArea(i, j, size) {
-    // 定位标记区域
-    if ((i < 9 && j < 9) || 
-        (i < 9 && j >= size - 8) || 
-        (i >= size - 8 && j < 9)) {
-      return true
-    }
-    
-    // 对齐标记区域
-    const center = Math.floor(size / 2)
-    if (Math.abs(i - center) <= 2 && Math.abs(j - center) <= 2) {
-      return true
-    }
-    
-    // 时序标记
-    if ((i === 6 && j >= 8 && j < size - 8) || 
-        (j === 6 && i >= 8 && i < size - 8)) {
-      return true
-    }
-    
+  // 检查是否为定位标记区域
+  isPositionMarkerArea(i, j, size) {
+    // 左上角
+    if (i < 9 && j < 9) return true
+    // 右上角
+    if (i < 9 && j >= size - 8) return true
+    // 左下角
+    if (i >= size - 8 && j < 9) return true
     return false
   },
 
@@ -696,73 +673,19 @@ Page({
 
   // 分享给好友
   shareToFriend() {
+    // 直接触发微信分享
     wx.showShareMenu({
       withShareTicket: true,
-      menus: ['shareAppMessage', 'shareTimeline']
+      menus: ['shareAppMessage']
     })
+    
+    // 关闭分享弹窗
+    this.closeShareModal()
     
     wx.showToast({
       title: '请点击右上角分享',
       icon: 'none',
       duration: 2000
-    })
-  },
-
-  // 保存二维码到相册
-  saveQRCode() {
-    wx.showLoading({
-      title: '正在保存...',
-      mask: true
-    })
-    
-    // 将canvas转换为临时文件
-    wx.canvasToTempFilePath({
-      canvasId: 'qrcode',
-      success: (res) => {
-        // 保存到相册
-        wx.saveImageToPhotosAlbum({
-          filePath: res.tempFilePath,
-          success: () => {
-            wx.hideLoading()
-            wx.showToast({
-              title: '已保存到相册',
-              icon: 'success',
-              duration: 2000
-            })
-          },
-          fail: (error) => {
-            wx.hideLoading()
-            console.log('保存失败:', error)
-            
-            if (error.errMsg.includes('auth')) {
-              // 权限问题，引导用户授权
-              wx.showModal({
-                title: '需要相册权限',
-                content: '保存二维码需要访问您的相册，请在设置中开启权限',
-                confirmText: '去设置',
-                success: (modalRes) => {
-                  if (modalRes.confirm) {
-                    wx.openSetting()
-                  }
-                }
-              })
-            } else {
-              wx.showToast({
-                title: '保存失败',
-                icon: 'error'
-              })
-            }
-          }
-        })
-      },
-      fail: (error) => {
-        wx.hideLoading()
-        console.log('生成图片失败:', error)
-        wx.showToast({
-          title: '生成图片失败',
-          icon: 'error'
-        })
-      }
     })
   },
 

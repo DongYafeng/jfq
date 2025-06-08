@@ -35,12 +35,12 @@ Page({
               if (roomData.timestamp) {
                 const now = Date.now()
                 const qrAge = now - roomData.timestamp
-                const maxAge = 24 * 60 * 60 * 1000 // 24小时有效期
+                const maxAge = 3 * 60 * 1000 // 3分钟有效期
                 
                 if (qrAge > maxAge) {
                   wx.showModal({
                     title: '二维码已过期',
-                    content: '此二维码已超过24小时，请向房主索取新的二维码',
+                    content: '此二维码已超过3分钟，请向房主索取新的二维码',
                     showCancel: false
                   })
                   return
