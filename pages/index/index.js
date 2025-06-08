@@ -90,8 +90,15 @@ Page({
                 }
               }
               
-              // 直接使用二维码中的房间信息创建或加入房间
-              this.joinRoomWithData(roomData)
+              // 对于简化的二维码，需要从本地存储获取完整房间信息
+              const localRoomInfo = wx.getStorageSync(`room_${roomData.roomId}`)
+              if (localRoomInfo) {
+                // 使用本地存储的完整房间信息
+                this.joinRoomWithData(localRoomInfo)
+              } else {
+                // 如果本地没有房间信息，直接根据房间ID加入
+                this.joinRoomById(roomData.roomId)
+              }
               return
             }
           } catch (e) {
@@ -191,16 +198,31 @@ Page({
     let existingRoom = wx.getStorageSync(`room_${roomData.roomId}`)
     
     if (!existingRoom) {
-      // 如果本地不存在房间，使用二维码中的数据创建房间
-      console.log('本地不存在房间，使用二维码数据创建房间')
+      // 如果本地不存在房间，说明这是通过分享链接进入的
+      // 需要创建一个基础房间结构，但不包含房主信息（房主信息应该由房主设备维护）
+      console.log('本地不存在房间，创建基础房间结构')
       existingRoom = {
         roomId: roomData.roomId,
-        name: roomData.name,
-        gameType: roomData.gameType,
+        name: roomData.name || `${roomData.gameType || '棋牌'}房间`,
+        gameType: roomData.gameType || '其他',
         maxPlayers: roomData.maxPlayers || 8,
-        initialScore: roomData.initialScore || 1000,
+        initialScore: roomData.initialScore || 0,
         players: [], // 空的玩家列表，等待加入
-        createTime: roomData.timestamp || Date.now()
+        createTime: roomData.timestamp || Date.now(),
+        isSharedRoom: true // 标记这是通过分享创建的房间
+      }
+      
+      // 如果分享数据中包含房主信息，添加房主
+      if (roomData.host) {
+        const hostPlayer = {
+          ...roomData.host,
+          score: roomData.initialScore || 0,
+          isHost: true,
+          playerId: roomData.hostPlayerId || generatePlayerId()
+        }
+        existingRoom.host = roomData.host
+        existingRoom.hostPlayerId = hostPlayer.playerId
+        existingRoom.players.push(hostPlayer)
       }
       
       // 保存房间信息到本地
@@ -313,3 +335,8 @@ Page({
     })
   }
 })
+
+// 添加工具方法
+function generatePlayerId() {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2, 3)
+}

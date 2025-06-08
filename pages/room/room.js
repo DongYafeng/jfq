@@ -50,18 +50,44 @@ Page({
       return
     }
 
+    console.log('房间信息:', roomInfo)
+    console.log('是否房主:', isHost)
+
     // 如果不是房主，需要加入房间
     if (isHost === 'false') {
       this.joinRoom(roomInfo)
     } else {
       // 房主的情况，找到房主的playerId
       const hostPlayer = roomInfo.players.find(p => p.isHost)
-      this.setData({
-        currentPlayerId: hostPlayer ? hostPlayer.playerId : this.generatePlayerId()
-      })
+      if (hostPlayer) {
+        this.setData({
+          currentPlayerId: hostPlayer.playerId
+        })
+      } else {
+        // 如果没有找到房主玩家，可能是数据异常，重新创建房主玩家
+        console.log('未找到房主玩家，重新创建')
+        const hostPlayerId = this.generatePlayerId()
+        const newHostPlayer = {
+          nickName: roomInfo.host?.nickName || '房主',
+          avatarUrl: roomInfo.host?.avatarUrl || '/images/default-avatar.svg',
+          score: roomInfo.initialScore || 0,
+          isHost: true,
+          playerId: hostPlayerId
+        }
+        roomInfo.players.unshift(newHostPlayer) // 添加到第一位
+        roomInfo.hostPlayerId = hostPlayerId
+        
+        // 更新本地存储
+        wx.setStorageSync(`room_${roomId}`, roomInfo)
+        
+        this.setData({
+          currentPlayerId: hostPlayerId
+        })
+      }
       
       // 为房主也添加设置个人信息的提示
-      if (hostPlayer && (hostPlayer.avatarUrl === '/images/default-avatar.svg' || hostPlayer.nickName.includes('微信用户'))) {
+      const currentHostPlayer = roomInfo.players.find(p => p.isHost)
+      if (currentHostPlayer && (currentHostPlayer.avatarUrl === '/images/default-avatar.svg' || currentHostPlayer.nickName.includes('微信用户'))) {
         setTimeout(() => {
           wx.showModal({
             title: '设置个人信息',
@@ -73,8 +99,8 @@ Page({
                 // 打开编辑弹窗
                 this.setData({
                   showEditModal: true,
-                  editNickName: hostPlayer.nickName,
-                  editAvatarUrl: hostPlayer.avatarUrl
+                  editNickName: currentHostPlayer.nickName,
+                  editAvatarUrl: currentHostPlayer.avatarUrl
                 })
               }
             }
@@ -331,19 +357,14 @@ Page({
   generateQRCode() {
     console.log('开始生成二维码...')
     
-    // 生成房间信息，包含完整的房间数据
+    // 简化二维码内容，只包含必要信息
     const roomData = {
       type: 'chess-room',
       roomId: this.data.roomInfo.roomId,
-      name: this.data.roomInfo.name,
-      gameType: this.data.roomInfo.gameType,
-      maxPlayers: this.data.roomInfo.maxPlayers,
-      initialScore: this.data.roomInfo.initialScore,
-      timestamp: Date.now(),
-      expireTime: Date.now() + (10 * 60 * 1000) // 10分钟后过期
+      timestamp: Date.now()
     }
     
-    // 生成包含完整房间信息的JSON格式二维码
+    // 生成简化的二维码文本
     const qrText = JSON.stringify(roomData)
     console.log('二维码文本:', qrText)
     
@@ -705,13 +726,15 @@ Page({
 
   // 分享给好友
   shareToFriend() {
-    // 构建包含房间信息的分享路径
+    // 构建包含房间信息的分享路径，包含房主信息
     const shareData = {
       roomId: this.data.roomInfo.roomId,
       name: this.data.roomInfo.name,
       gameType: this.data.roomInfo.gameType,
       maxPlayers: this.data.roomInfo.maxPlayers,
       initialScore: this.data.roomInfo.initialScore,
+      host: this.data.roomInfo.host, // 包含房主信息
+      hostPlayerId: this.data.roomInfo.hostPlayerId, // 包含房主玩家ID
       timestamp: Date.now()
     }
     
@@ -720,6 +743,7 @@ Page({
     const sharePath = `/pages/index/index?shareData=${encodedData}`
     
     console.log('分享路径:', sharePath)
+    console.log('分享数据:', shareData)
     
     // 触发微信分享
     wx.showShareMenu({
@@ -745,6 +769,8 @@ Page({
       gameType: this.data.roomInfo.gameType,
       maxPlayers: this.data.roomInfo.maxPlayers,
       initialScore: this.data.roomInfo.initialScore,
+      host: this.data.roomInfo.host, // 包含房主信息
+      hostPlayerId: this.data.roomInfo.hostPlayerId, // 包含房主玩家ID
       timestamp: Date.now()
     }
     
@@ -779,6 +805,8 @@ Page({
       gameType: this.data.roomInfo.gameType,
       maxPlayers: this.data.roomInfo.maxPlayers,
       initialScore: this.data.roomInfo.initialScore,
+      host: this.data.roomInfo.host, // 包含房主信息
+      hostPlayerId: this.data.roomInfo.hostPlayerId, // 包含房主玩家ID
       timestamp: Date.now()
     }
     

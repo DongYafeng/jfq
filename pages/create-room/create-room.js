@@ -113,19 +113,27 @@ Page({
       maxPlayers = 3 // 斗地主3人游戏
     }
     
+    // 生成房主玩家ID
+    const hostPlayerId = this.generatePlayerId()
+    
+    // 创建房主玩家信息
+    const hostPlayer = {
+      ...userInfo,
+      score: 0, // 初始分数改为0
+      isHost: true,
+      playerId: hostPlayerId
+    }
+    
     const roomData = {
       roomId: roomId,
       name: `${selectedGame.name}房间`,
       gameType: selectedGame.name,
       maxPlayers: maxPlayers,
       initialScore: 0, // 初始分数改为0
-      host: userInfo,
-      players: [{
-        ...userInfo,
-        score: 0, // 初始分数改为0
-        isHost: true,
-        playerId: this.generatePlayerId()
-      }]
+      host: userInfo, // 保留房主基本信息
+      hostPlayerId: hostPlayerId, // 添加房主玩家ID
+      players: [hostPlayer], // 房主作为第一个玩家
+      createTime: Date.now() // 添加创建时间
     }
 
     console.log('创建房间:', roomData)
