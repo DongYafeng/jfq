@@ -376,6 +376,44 @@
   max-height: 85vh;
 }
 
+.share-modal .modal-header {
+  padding: 40rpx 32rpx 32rpx 40rpx;
+  border-bottom: 1rpx solid #e1e5e9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+.share-modal .modal-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #2d3748;
+  flex: 1;
+}
+
+.share-modal .modal-close {
+  background: rgba(113, 128, 150, 0.1);
+  border: none;
+  font-size: 36rpx;
+  color: #718096;
+  padding: 8rpx;
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 24rpx;
+  transition: all 0.3s ease;
+}
+
+.share-modal .modal-close:active {
+  color: #2d3748;
+  background: rgba(113, 128, 150, 0.2);
+  transform: scale(0.9);
+}
+
 .share-content {
   padding: 32rpx;
   display: flex;
@@ -416,7 +454,7 @@
 
 .room-card-details {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 24rpx;
 }
 

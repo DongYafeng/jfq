@@ -342,15 +342,18 @@ Page({
       gameType: this.data.roomInfo.gameType,
       path: miniProgramPath,
       appId: 'chess-score-app',
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      expireTime: Date.now() + (3 * 60 * 1000) // 3分钟后过期
     }
     
     // 生成包含房间信息的JSON字符串
     const qrData = JSON.stringify(roomData)
     console.log('二维码数据:', qrData)
     
-    // 生成二维码
-    this.generateQRCodeCanvas(qrData)
+    // 延迟生成二维码，确保Canvas已经渲染
+    setTimeout(() => {
+      this.generateQRCodeCanvas(qrData)
+    }, 100)
   },
 
   // 生成二维码画布
@@ -363,8 +366,14 @@ Page({
       
       if (!ctx) {
         console.error('无法创建Canvas上下文')
+        wx.showToast({
+          title: '二维码生成失败',
+          icon: 'error'
+        })
         return
       }
+      
+      console.log('Canvas上下文创建成功，开始绘制...')
       
       // 清空画布
       ctx.clearRect(0, 0, size, size)
@@ -375,15 +384,20 @@ Page({
       
       // 绘制边框
       ctx.setStrokeStyle('#e2e8f0')
-      ctx.setLineWidth(2)
-      ctx.strokeRect(1, 1, size - 2, size - 2)
+      ctx.setLineWidth(1)
+      ctx.strokeRect(0, 0, size, size)
       
-      // 生成更标准的二维码
-      this.drawStandardQRCode(ctx, data, size)
+      // 生成二维码模式
+      this.drawQRCodePattern(ctx, data, size)
       
       // 执行绘制
       ctx.draw(false, () => {
         console.log('二维码绘制完成')
+        wx.showToast({
+          title: '二维码已生成',
+          icon: 'success',
+          duration: 1000
+        })
       })
     } catch (error) {
       console.error('二维码生成失败:', error)
@@ -394,11 +408,11 @@ Page({
     }
   },
 
-  // 绘制标准二维码
-  drawStandardQRCode(ctx, data, size) {
-    console.log('开始绘制二维码内容...')
+  // 绘制二维码模式
+  drawQRCodePattern(ctx, data, size) {
+    console.log('开始绘制二维码模式...')
     
-    const gridSize = 21 // 标准二维码网格大小
+    const gridSize = 25 // 二维码网格大小
     const margin = 20 // 边距
     const qrSize = size - margin * 2
     const cellSize = Math.floor(qrSize / gridSize)
@@ -408,20 +422,23 @@ Page({
     console.log(`网格参数: gridSize=${gridSize}, cellSize=${cellSize}, startX=${startX}, startY=${startY}`)
     
     // 生成基于数据的二维码模式
-    const pattern = this.generateStandardQRPattern(data, gridSize)
+    const pattern = this.generateQRPattern(data, gridSize)
     
     ctx.setFillStyle('#000000')
     
     // 绘制定位标记（三个角）
-    this.drawPositionMarker(ctx, startX, startY, cellSize)
-    this.drawPositionMarker(ctx, startX + (gridSize - 7) * cellSize, startY, cellSize)
-    this.drawPositionMarker(ctx, startX, startY + (gridSize - 7) * cellSize, cellSize)
+    this.drawFinderPattern(ctx, startX, startY, cellSize) // 左上角
+    this.drawFinderPattern(ctx, startX + (gridSize - 7) * cellSize, startY, cellSize) // 右上角
+    this.drawFinderPattern(ctx, startX, startY + (gridSize - 7) * cellSize, cellSize) // 左下角
+    
+    // 绘制时序模式（Timing Pattern）
+    this.drawTimingPattern(ctx, startX, startY, cellSize, gridSize)
     
     // 绘制数据模式
     for (let i = 0; i < gridSize; i++) {
       for (let j = 0; j < gridSize; j++) {
-        // 跳过定位标记区域
-        if (this.isPositionMarkerArea(i, j, gridSize)) continue
+        // 跳过定位标记区域和时序模式
+        if (this.isReservedArea(i, j, gridSize)) continue
         
         if (pattern[i][j]) {
           ctx.fillRect(
@@ -434,83 +451,81 @@ Page({
       }
     }
     
-    // 绘制房间信息
-    this.drawRoomInfo(ctx, size)
-    
-    console.log('二维码内容绘制完成')
+    console.log('二维码模式绘制完成')
   },
 
-  // 生成标准二维码模式
-  generateStandardQRPattern(data, size) {
+  // 生成二维码模式
+  generateQRPattern(data, size) {
     const pattern = []
     
-    // 使用简化的哈希算法
-    let hash = this.calculateSimpleHash(data)
+    // 使用数据生成哈希值
+    let hash = 0
+    for (let i = 0; i < data.length; i++) {
+      const char = data.charCodeAt(i)
+      hash = ((hash << 5) - hash + char) & 0xFFFFFF
+    }
     
-    // 生成数据模式
+    // 生成伪随机模式
     for (let i = 0; i < size; i++) {
       pattern[i] = []
       for (let j = 0; j < size; j++) {
-        // 基于位置和数据生成模式
-        const seed = hash + i * 17 + j * 13
-        pattern[i][j] = (seed % 100) < 50 // 50%的填充率
+        // 使用线性同余生成器
+        const seed = (hash + i * 31 + j * 17) % 1000
+        pattern[i][j] = seed < 450 // 约45%的填充率
       }
     }
     
     return pattern
   },
 
-  // 简化的哈希计算
-  calculateSimpleHash(data) {
-    let hash = 0
-    for (let i = 0; i < data.length; i++) {
-      const char = data.charCodeAt(i)
-      hash = ((hash << 3) - hash + char) & 0xFFFF
+  // 检查是否为保留区域
+  isReservedArea(i, j, size) {
+    // 定位标记区域
+    if ((i < 9 && j < 9) || // 左上角
+        (i < 9 && j >= size - 8) || // 右上角
+        (i >= size - 8 && j < 9)) { // 左下角
+      return true
     }
-    return Math.abs(hash)
-  },
-
-  // 检查是否为定位标记区域
-  isPositionMarkerArea(i, j, size) {
-    // 左上角
-    if (i < 9 && j < 9) return true
-    // 右上角
-    if (i < 9 && j >= size - 8) return true
-    // 左下角
-    if (i >= size - 8 && j < 9) return true
+    
+    // 时序模式
+    if (i === 6 || j === 6) {
+      return true
+    }
+    
     return false
   },
 
-  // 绘制房间信息
-  drawRoomInfo(ctx, size) {
-    // 设置文字样式
-    ctx.setFillStyle('#2d3748')
-    ctx.setTextAlign('center')
-    
-    // 房间名称
-    ctx.setFontSize(14)
-    ctx.setFontWeight('bold')
-    ctx.fillText(this.data.roomInfo.name, size / 2, size - 35)
-    
-    // 游戏类型和房间号
-    ctx.setFontSize(11)
-    ctx.setFontWeight('normal')
-    ctx.fillText(`${this.data.roomInfo.gameType} · 房间号: ${this.data.roomInfo.roomId}`, size / 2, size - 20)
-    
-    // 扫码提示
-    ctx.setFontSize(10)
-    ctx.setFillStyle('#718096')
-    ctx.fillText('扫码加入房间', size / 2, size - 8)
-  },
-
   // 绘制定位标记
-  drawPositionMarker(ctx, x, y, cellSize) {
-    // 外框 7x7
+  drawFinderPattern(ctx, x, y, cellSize) {
+    // 外框 7x7 黑色
     ctx.fillRect(x, y, 7 * cellSize, 7 * cellSize)
+    
+    // 内框 5x5 白色
     ctx.setFillStyle('#ffffff')
     ctx.fillRect(x + cellSize, y + cellSize, 5 * cellSize, 5 * cellSize)
+    
+    // 中心 3x3 黑色
     ctx.setFillStyle('#000000')
     ctx.fillRect(x + 2 * cellSize, y + 2 * cellSize, 3 * cellSize, 3 * cellSize)
+  },
+
+  // 绘制时序模式
+  drawTimingPattern(ctx, startX, startY, cellSize, gridSize) {
+    ctx.setFillStyle('#000000')
+    
+    // 水平时序模式
+    for (let j = 8; j < gridSize - 8; j++) {
+      if (j % 2 === 0) {
+        ctx.fillRect(startX + j * cellSize, startY + 6 * cellSize, cellSize, cellSize)
+      }
+    }
+    
+    // 垂直时序模式
+    for (let i = 8; i < gridSize - 8; i++) {
+      if (i % 2 === 0) {
+        ctx.fillRect(startX + 6 * cellSize, startY + i * cellSize, cellSize, cellSize)
+      }
+    }
   },
 
   exitRoom() {
