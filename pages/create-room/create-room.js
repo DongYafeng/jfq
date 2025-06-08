@@ -28,14 +28,43 @@ Page({
     selectedGameIndex: -1
   },
 
-  selectGameType(e) {
-    const index = parseInt(e.currentTarget.dataset.index)
+  onLoad() {
+    console.log('创建房间页面加载完成')
+  },
+
+  selectGame(e) {
+    console.log('selectGame方法被调用', e)
+    const index = e.currentTarget.dataset.index
+    console.log('选择的游戏索引:', index)
+    
+    if (index === undefined || index === null) {
+      console.error('游戏索引无效')
+      wx.showToast({
+        title: '选择失败，请重试',
+        icon: 'error'
+      })
+      return
+    }
+    
+    const selectedGame = this.data.gameTypes[index]
+    console.log('选择的游戏:', selectedGame)
+    
+    // 更新选中状态
     this.setData({
       selectedGameIndex: index
     })
     
-    // 选择后直接创建房间
-    this.createRoom()
+    // 显示选择反馈
+    wx.showToast({
+      title: `已选择${selectedGame.name}`,
+      icon: 'success',
+      duration: 1000
+    })
+    
+    // 选择游戏类型后直接创建房间
+    setTimeout(() => {
+      this.createRoom()
+    }, 1200) // 增加延迟，让用户看到选择反馈
   },
 
   createRoom() {
@@ -56,40 +85,41 @@ Page({
   },
 
   getUserInfoAndCreateRoom() {
-    // 先尝试从全局数据获取
+    // 先尝试从全局获取用户信息
     let userInfo = app.globalData.userInfo
     
     if (userInfo) {
       this.doCreateRoom(userInfo)
-    } else {
-      // 获取用户信息
-      wx.getUserProfile({
-        desc: '用于创建房间和显示用户信息',
-        success: (res) => {
-          userInfo = res.userInfo
-          app.globalData.userInfo = userInfo
-          this.doCreateRoom(userInfo)
-        },
-        fail: () => {
-          // 如果用户拒绝授权，尝试使用getUserInfo
-          wx.getUserInfo({
-            success: (res) => {
-              userInfo = res.userInfo
-              app.globalData.userInfo = userInfo
-              this.doCreateRoom(userInfo)
-            },
-            fail: () => {
-              // 最后使用默认信息
-              userInfo = {
-                nickName: '微信用户' + Math.floor(Math.random() * 1000),
-                avatarUrl: '/images/default-avatar.svg'
-              }
-              this.doCreateRoom(userInfo)
-            }
-          })
-        }
-      })
+      return
     }
+
+    // 尝试获取用户信息
+    wx.getUserProfile({
+      desc: '用于创建房间和显示用户信息',
+      success: (res) => {
+        userInfo = res.userInfo
+        app.globalData.userInfo = userInfo
+        this.doCreateRoom(userInfo)
+      },
+      fail: () => {
+        // 如果用户拒绝授权，尝试使用getUserInfo
+        wx.getUserInfo({
+          success: (res) => {
+            userInfo = res.userInfo
+            app.globalData.userInfo = userInfo
+            this.doCreateRoom(userInfo)
+          },
+          fail: () => {
+            // 最后使用默认信息
+            userInfo = {
+              nickName: '微信用户' + Math.floor(Math.random() * 1000),
+              avatarUrl: '/images/default-avatar.svg'
+            }
+            this.doCreateRoom(userInfo)
+          }
+        })
+      }
+    })
   },
 
   doCreateRoom(userInfo) {
@@ -122,6 +152,8 @@ Page({
       }],
       createdAt: new Date().getTime()
     }
+
+    console.log('创建房间:', roomData)
 
     // 保存房间数据到本地存储
     wx.setStorageSync(`room_${roomId}`, roomData)

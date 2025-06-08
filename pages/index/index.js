@@ -19,10 +19,12 @@ Page({
   scanCode() {
     wx.scanCode({
       success: (res) => {
-        console.log('扫码结果:', res)
+        console.log('扫码结果:', res.result)
+        
         try {
           const roomData = JSON.parse(res.result)
-          if (roomData.type === 'chess-room' && roomData.roomId) {
+          
+          if (roomData && roomData.type === 'chess-room' && roomData.roomId) {
             // 跳转到房间页面
             wx.navigateTo({
               url: `/pages/room/room?roomId=${roomData.roomId}&isHost=false`
@@ -34,8 +36,9 @@ Page({
             })
           }
         } catch (error) {
+          console.log('解析二维码失败:', error)
           wx.showToast({
-            title: '二维码格式错误',
+            title: '无效的房间二维码',
             icon: 'error'
           })
         }

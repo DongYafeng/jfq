@@ -14,7 +14,7 @@
       wx:for="{{gameTypes}}" 
       wx:key="index" 
       class="game-card {{selectedGameIndex === index ? 'selected' : ''}}"
-      bindtap="selectGameType"
+      bindtap="selectGame"
       data-index="{{index}}"
     >
       <view class="game-icon">
