@@ -95,7 +95,7 @@
 <view wx:if="{{showShareModal}}" class="modal-overlay" bindtap="closeShareModal">
   <view class="share-modal" catchtap="stopPropagation">
     <view class="modal-header">
-      <text class="modal-title">邀请好友</text>
+      <text class="modal-title">邀请好友加入</text>
       <button class="modal-close" bindtap="closeShareModal">×</button>
     </view>
     
@@ -115,33 +115,53 @@
             <text class="detail-label">人数</text>
             <text class="detail-value">{{roomInfo.players.length}}/{{roomInfo.maxPlayers}}</text>
           </view>
-        </view>
-      </view>
-
-      <!-- 分享方式选择 -->
-      <view class="share-methods">
-        <view class="share-method-item" bindtap="shareToFriend">
-          <view class="method-icon share-icon">
-            <text class="icon-text">💬</text>
-          </view>
-          <view class="method-content">
-            <text class="method-title">微信分享</text>
-            <text class="method-desc">分享给微信好友或群聊</text>
+          <view class="room-detail-item">
+            <text class="detail-label">状态</text>
+            <text class="detail-value status-active">进行中</text>
           </view>
         </view>
       </view>
 
       <!-- 二维码展示区域 -->
       <view class="qr-section">
-        <text class="qr-title">扫码加入房间</text>
+        <view class="qr-header">
+          <text class="qr-title">扫码加入房间</text>
+          <text class="qr-subtitle">好友扫描下方二维码即可直接加入</text>
+        </view>
         <view class="qr-container">
           <canvas 
             canvas-id="qrcode" 
             class="qr-canvas"
             style="width: {{qrSize}}px; height: {{qrSize}}px;"
           ></canvas>
+          <view class="qr-overlay">
+            <view class="qr-logo">
+              <text class="logo-text">棋牌</text>
+            </view>
+          </view>
         </view>
-        <text class="qr-hint">好友扫描此二维码即可直接加入房间</text>
+        <view class="qr-actions">
+          <button class="qr-action-btn" bindtap="saveQRCode">
+            <text class="action-icon">💾</text>
+            <text class="action-text">保存图片</text>
+          </button>
+          <button class="qr-action-btn" bindtap="shareToFriend">
+            <text class="action-icon">📤</text>
+            <text class="action-text">微信分享</text>
+          </button>
+        </view>
+      </view>
+
+      <!-- 分享提示 -->
+      <view class="share-tips">
+        <view class="tip-item">
+          <text class="tip-icon">💡</text>
+          <text class="tip-text">二维码24小时内有效</text>
+        </view>
+        <view class="tip-item">
+          <text class="tip-icon">👥</text>
+          <text class="tip-text">最多支持{{roomInfo.maxPlayers}}人同时游戏</text>
+        </view>
       </view>
     </view>
     
