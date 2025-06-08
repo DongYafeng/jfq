@@ -14,7 +14,8 @@ Page({
     showShareModal: false,
     qrSize: 200,
     showEditModal: false,
-    editNickName: ''
+    editNickName: '',
+    editAvatarUrl: ''
   },
 
   onLoad(options) {
@@ -58,6 +59,28 @@ Page({
       this.setData({
         currentPlayerId: hostPlayer ? hostPlayer.playerId : this.generatePlayerId()
       })
+      
+      // 为房主也添加设置个人信息的提示
+      if (hostPlayer && (hostPlayer.avatarUrl === '/images/default-avatar.svg' || hostPlayer.nickName.includes('微信用户'))) {
+        setTimeout(() => {
+          wx.showModal({
+            title: '设置个人信息',
+            content: '检测到您使用的是默认头像和昵称，是否要设置真实的头像和昵称？',
+            confirmText: '去设置',
+            cancelText: '稍后再说',
+            success: (res) => {
+              if (res.confirm) {
+                // 打开编辑弹窗
+                this.setData({
+                  showEditModal: true,
+                  editNickName: hostPlayer.nickName,
+                  editAvatarUrl: hostPlayer.avatarUrl
+                })
+              }
+            }
+          })
+        }, 1000)
+      }
     }
     
     this.setData({
@@ -71,39 +94,16 @@ Page({
 
   joinRoom(roomInfo) {
     // 获取用户信息
-    let userInfo = app.globalData.userInfo
-    
-    if (!userInfo) {
-      // 如果没有用户信息，尝试获取
-      wx.getUserProfile({
-        desc: '用于加入房间和显示用户信息',
-        success: (res) => {
-          userInfo = res.userInfo
-          app.globalData.userInfo = userInfo
-          this.addPlayerToRoom(roomInfo, userInfo)
-        },
-        fail: () => {
-          // 如果用户拒绝授权，尝试使用getUserInfo
-          wx.getUserInfo({
-            success: (res) => {
-              userInfo = res.userInfo
-              app.globalData.userInfo = userInfo
-              this.addPlayerToRoom(roomInfo, userInfo)
-            },
-            fail: () => {
-              // 最后使用默认信息
-              userInfo = {
-                nickName: '微信用户' + Math.floor(Math.random() * 1000),
-                avatarUrl: '/images/default-avatar.svg'
-              }
-              this.addPlayerToRoom(roomInfo, userInfo)
-            }
-          })
-        }
-      })
-    } else {
+    app.getUserInfo().then(userInfo => {
       this.addPlayerToRoom(roomInfo, userInfo)
-    }
+    }).catch(() => {
+      // 使用默认信息
+      const userInfo = {
+        nickName: '微信用户' + Math.floor(Math.random() * 1000),
+        avatarUrl: '/images/default-avatar.svg'
+      }
+      this.addPlayerToRoom(roomInfo, userInfo)
+    })
   },
 
   addPlayerToRoom(roomInfo, userInfo) {
@@ -163,6 +163,28 @@ Page({
     
     // 播报用户进入房间
     this.playVoiceAnnouncement(`${userInfo.nickName}进入了房间`)
+    
+    // 如果使用的是默认头像，提示用户设置个人信息
+    if (userInfo.avatarUrl === '/images/default-avatar.svg' || userInfo.nickName.includes('微信用户')) {
+      setTimeout(() => {
+        wx.showModal({
+          title: '设置个人信息',
+          content: '检测到您使用的是默认头像和昵称，是否要设置真实的头像和昵称？',
+          confirmText: '去设置',
+          cancelText: '稍后再说',
+          success: (res) => {
+            if (res.confirm) {
+              // 打开编辑弹窗
+              this.setData({
+                showEditModal: true,
+                editNickName: userInfo.nickName,
+                editAvatarUrl: userInfo.avatarUrl
+              })
+            }
+          }
+        })
+      }, 2000)
+    }
   },
 
   loadScoreHistory(roomId) {
@@ -179,7 +201,8 @@ Page({
     if (player.playerId === this.data.currentPlayerId) {
       this.setData({
         showEditModal: true,
-        editNickName: player.nickName
+        editNickName: player.nickName,
+        editAvatarUrl: player.avatarUrl
       })
       return
     }
@@ -487,7 +510,8 @@ Page({
   closeEditModal() {
     this.setData({
       showEditModal: false,
-      editNickName: ''
+      editNickName: '',
+      editAvatarUrl: ''
     })
   },
 
@@ -499,6 +523,7 @@ Page({
 
   confirmEdit() {
     const nickName = this.data.editNickName.trim()
+    const avatarUrl = this.data.editAvatarUrl
     
     if (!nickName) {
       wx.showToast({
@@ -516,12 +541,8 @@ Page({
       return
     }
 
-    // 获取当前用户的头像
-    const currentPlayer = this.data.roomInfo.players.find(p => p.playerId === this.data.currentPlayerId)
-    const currentAvatar = currentPlayer ? currentPlayer.avatarUrl : '/images/default-avatar.svg'
-
     // 更新用户信息
-    this.updateUserInfo(nickName, currentAvatar)
+    this.updateUserInfo(nickName, avatarUrl)
     
     // 关闭弹窗
     this.closeEditModal()
@@ -594,6 +615,20 @@ Page({
       title: text,
       icon: 'none',
       duration: 2000
+    })
+  },
+
+  // 选择头像
+  onChooseAvatar(e) {
+    const { avatarUrl } = e.detail
+    console.log('选择的头像:', avatarUrl)
+    this.setData({
+      editAvatarUrl: avatarUrl
+    })
+    wx.showToast({
+      title: '头像已更新',
+      icon: 'success',
+      duration: 1000
     })
   },
 })

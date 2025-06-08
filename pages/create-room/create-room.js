@@ -85,40 +85,16 @@ Page({
   },
 
   getUserInfoAndCreateRoom() {
-    // 先尝试从全局获取用户信息
-    let userInfo = app.globalData.userInfo
-    
-    if (userInfo) {
+    // 使用app的getUserInfo方法
+    app.getUserInfo().then(userInfo => {
       this.doCreateRoom(userInfo)
-      return
-    }
-
-    // 尝试获取用户信息
-    wx.getUserProfile({
-      desc: '用于创建房间和显示用户信息',
-      success: (res) => {
-        userInfo = res.userInfo
-        app.globalData.userInfo = userInfo
-        this.doCreateRoom(userInfo)
-      },
-      fail: () => {
-        // 如果用户拒绝授权，尝试使用getUserInfo
-        wx.getUserInfo({
-          success: (res) => {
-            userInfo = res.userInfo
-            app.globalData.userInfo = userInfo
-            this.doCreateRoom(userInfo)
-          },
-          fail: () => {
-            // 最后使用默认信息
-            userInfo = {
-              nickName: '微信用户' + Math.floor(Math.random() * 1000),
-              avatarUrl: '/images/default-avatar.svg'
-            }
-            this.doCreateRoom(userInfo)
-          }
-        })
+    }).catch(() => {
+      // 使用默认信息
+      const userInfo = {
+        nickName: '微信用户' + Math.floor(Math.random() * 1000),
+        avatarUrl: '/images/default-avatar.svg'
       }
+      this.doCreateRoom(userInfo)
     })
   },
 

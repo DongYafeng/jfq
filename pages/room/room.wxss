@@ -561,10 +561,11 @@
 .edit-modal {
   background: white;
   border-radius: 24rpx;
-  width: 100%;
+  width: 90%;
   max-width: 600rpx;
   max-height: 80vh;
   overflow: hidden;
+  animation: modal-slide-up 0.3s ease;
 }
 
 .edit-modal .modal-header {
@@ -602,6 +603,65 @@
   transform: scale(0.9);
 }
 
+/* 头像选择区域 */
+.avatar-section {
+  margin-bottom: 40rpx;
+}
+
+.avatar-selector {
+  display: flex;
+  justify-content: center;
+  margin: 20rpx 0;
+}
+
+.avatar-btn {
+  position: relative;
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  overflow: hidden;
+  border: none;
+  padding: 0;
+  background: transparent;
+}
+
+.avatar-btn::after {
+  border: none;
+}
+
+.edit-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatar-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 50%;
+}
+
+.avatar-btn:active .avatar-overlay {
+  opacity: 1;
+}
+
+.avatar-text {
+  color: white;
+  font-size: 24rpx;
+  font-weight: 500;
+}
+
+/* 昵称编辑区域 */
 .nickname-section {
   margin-bottom: 20rpx;
 }

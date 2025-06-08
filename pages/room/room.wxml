@@ -173,12 +173,26 @@
     </view>
     
     <view class="modal-content">
+      <!-- 头像选择 -->
+      <view class="avatar-section">
+        <text class="input-label">头像</text>
+        <view class="avatar-selector">
+          <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+            <image class="edit-avatar" src="{{editAvatarUrl || '/images/default-avatar.svg'}}" />
+            <view class="avatar-overlay">
+              <text class="avatar-text">点击更换</text>
+            </view>
+          </button>
+        </view>
+        <text class="input-hint">点击头像可更换为微信头像</text>
+      </view>
+      
       <!-- 昵称编辑 -->
       <view class="nickname-section">
         <text class="input-label">昵称</text>
         <input 
           class="nickname-input" 
-          type="text" 
+          type="nickname"
           placeholder="请输入昵称" 
           value="{{editNickName}}"
           bindinput="onNickNameInput"
