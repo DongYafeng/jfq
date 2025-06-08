@@ -15,9 +15,7 @@ Page({
     qrSize: 200,
     showEditModal: false,
     editNickName: '',
-    editAvatarUrl: '',
-    gameTimer: '00:00:00',
-    timerInterval: null
+    editAvatarUrl: ''
   },
 
   onLoad(options) {
@@ -92,9 +90,6 @@ Page({
 
     // 加载计分历史
     this.loadScoreHistory(roomId)
-    
-    // 启动游戏计时器
-    this.startGameTimer(roomInfo.createTime)
   },
 
   joinRoom(roomInfo) {
@@ -754,51 +749,6 @@ Page({
       title: `${this.data.roomInfo.name} - 棋牌计分器`,
       query: `roomId=${this.data.roomInfo.roomId}&isHost=false`,
       imageUrl: '' // 可以添加分享图片
-    }
-  },
-
-  // 启动游戏计时器
-  startGameTimer(createTime) {
-    // 清除之前的计时器
-    if (this.data.timerInterval) {
-      clearInterval(this.data.timerInterval)
-    }
-    
-    const startTime = new Date(createTime).getTime()
-    
-    // 立即更新一次
-    this.updateTimer(startTime)
-    
-    // 设置定时器每秒更新
-    const interval = setInterval(() => {
-      this.updateTimer(startTime)
-    }, 1000)
-    
-    this.setData({
-      timerInterval: interval
-    })
-  },
-
-  // 更新计时器显示
-  updateTimer(startTime) {
-    const now = Date.now()
-    const duration = Math.floor((now - startTime) / 1000) // 转换为秒
-    
-    const hours = Math.floor(duration / 3600)
-    const minutes = Math.floor((duration % 3600) / 60)
-    const seconds = duration % 60
-    
-    const timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
-    
-    this.setData({
-      gameTimer: timeStr
-    })
-  },
-
-  // 页面卸载时清理计时器
-  onUnload() {
-    if (this.data.timerInterval) {
-      clearInterval(this.data.timerInterval)
     }
   },
 })

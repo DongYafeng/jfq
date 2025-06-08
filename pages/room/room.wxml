@@ -103,23 +103,13 @@
       <!-- 房间信息卡片 -->
       <view class="room-info-card">
         <view class="room-card-header">
-          <view class="room-title-section">
-            <text class="room-card-name">{{roomInfo.name}}</text>
-            <text class="room-card-type">{{roomInfo.gameType}}</text>
-          </view>
-          <view class="timer-section">
-            <text class="timer-label">游戏时长</text>
-            <text class="timer-display">{{gameTimer}}</text>
-          </view>
+          <text class="room-card-name">{{roomInfo.name}}</text>
+          <text class="room-card-type">{{roomInfo.gameType}}</text>
         </view>
         <view class="room-card-details">
           <view class="room-detail-item">
             <text class="detail-label">当前人数</text>
             <text class="detail-value">{{roomInfo.players.length}}/{{roomInfo.maxPlayers}}</text>
-          </view>
-          <view class="room-detail-item">
-            <text class="detail-label">房间状态</text>
-            <text class="detail-value status-active">进行中</text>
           </view>
         </view>
       </view>

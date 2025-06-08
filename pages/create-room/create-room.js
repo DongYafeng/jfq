@@ -125,8 +125,7 @@ Page({
         score: 0, // 初始分数改为0
         isHost: true,
         playerId: this.generatePlayerId()
-      }],
-      createTime: new Date().getTime()
+      }]
     }
 
     console.log('创建房间:', roomData)
