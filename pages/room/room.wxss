@@ -440,15 +440,17 @@
   display: flex;
   flex-direction: column;
   gap: 16rpx;
+  margin-bottom: 32rpx;
 }
 
 .share-method-item {
   background: #f8fafc;
   border: 2rpx solid #e2e8f0;
   border-radius: 16rpx;
-  padding: 24rpx;
+  padding: 32rpx 24rpx;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 20rpx;
   transition: all 0.3s ease;
 }
@@ -468,10 +470,6 @@
   font-size: 32rpx;
 }
 
-.copy-icon {
-  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-}
-
 .share-icon {
   background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
 }
@@ -481,6 +479,7 @@
   display: flex;
   flex-direction: column;
   gap: 8rpx;
+  text-align: center;
 }
 
 .method-title {

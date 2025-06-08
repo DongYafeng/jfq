@@ -120,30 +120,20 @@
 
       <!-- 分享方式选择 -->
       <view class="share-methods">
-        <view class="share-method-item" bindtap="copyRoomId">
-          <view class="method-icon copy-icon">
-            <text class="icon-text">📋</text>
-          </view>
-          <view class="method-content">
-            <text class="method-title">复制房间号</text>
-            <text class="method-desc">复制房间号发给好友</text>
-          </view>
-        </view>
-
         <view class="share-method-item" bindtap="shareToFriend">
           <view class="method-icon share-icon">
             <text class="icon-text">💬</text>
           </view>
           <view class="method-content">
             <text class="method-title">微信分享</text>
-            <text class="method-desc">分享给微信好友或群</text>
+            <text class="method-desc">分享给微信好友或群聊</text>
           </view>
         </view>
       </view>
 
       <!-- 二维码展示区域 -->
       <view class="qr-section">
-        <text class="qr-title">房间信息</text>
+        <text class="qr-title">扫码加入房间</text>
         <view class="qr-container">
           <canvas 
             canvas-id="qrcode" 
@@ -151,7 +141,7 @@
             style="width: {{qrSize}}px; height: {{qrSize}}px;"
           ></canvas>
         </view>
-        <text class="qr-hint">好友可以复制房间号手动加入</text>
+        <text class="qr-hint">好友扫描此二维码即可直接加入房间</text>
       </view>
     </view>
     

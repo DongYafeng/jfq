@@ -3,8 +3,6 @@ const app = getApp()
 
 Page({
   data: {
-    showJoinModal: false,
-    roomIdInput: ''
   },
 
   onLoad() {
@@ -24,12 +22,36 @@ Page({
         console.log('扫码结果:', res.result)
         
         try {
-          const roomData = JSON.parse(res.result)
+          // 尝试解析小程序码参数
+          let roomId = null
           
-          if (roomData && roomData.type === 'chess-room' && roomData.roomId) {
+          // 方式1: 解析JSON格式的二维码
+          try {
+            const roomData = JSON.parse(res.result)
+            if (roomData && roomData.type === 'chess-room' && roomData.roomId) {
+              roomId = roomData.roomId
+            }
+          } catch (e) {
+            // 方式2: 解析URL参数格式
+            const urlParams = new URLSearchParams(res.result.split('?')[1] || res.result)
+            roomId = urlParams.get('roomId')
+          }
+          
+          if (roomId) {
+            // 检查房间是否存在
+            const roomInfo = wx.getStorageSync(`room_${roomId}`)
+            
+            if (!roomInfo) {
+              wx.showToast({
+                title: '房间不存在或已解散',
+                icon: 'error'
+              })
+              return
+            }
+            
             // 跳转到房间页面
             wx.navigateTo({
-              url: `/pages/room/room?roomId=${roomData.roomId}&isHost=false`
+              url: `/pages/room/room?roomId=${roomId}&isHost=false`
             })
           } else {
             wx.showToast({
@@ -55,65 +77,5 @@ Page({
         }
       }
     })
-  },
-
-  // 显示手动加入弹窗
-  showJoinRoomModal() {
-    this.setData({
-      showJoinModal: true,
-      roomIdInput: ''
-    })
-  },
-
-  // 关闭手动加入弹窗
-  closeJoinModal() {
-    this.setData({
-      showJoinModal: false,
-      roomIdInput: ''
-    })
-  },
-
-  // 输入房间号
-  onRoomIdInput(e) {
-    this.setData({
-      roomIdInput: e.detail.value
-    })
-  },
-
-  // 确认加入房间
-  confirmJoinRoom() {
-    const roomId = this.data.roomIdInput.trim()
-    
-    if (!roomId) {
-      wx.showToast({
-        title: '请输入房间号',
-        icon: 'error'
-      })
-      return
-    }
-
-    // 检查房间是否存在
-    const roomInfo = wx.getStorageSync(`room_${roomId}`)
-    
-    if (!roomInfo) {
-      wx.showToast({
-        title: '房间不存在',
-        icon: 'error'
-      })
-      return
-    }
-
-    // 关闭弹窗
-    this.closeJoinModal()
-
-    // 跳转到房间页面
-    wx.navigateTo({
-      url: `/pages/room/room?roomId=${roomId}&isHost=false`
-    })
-  },
-
-  // 阻止事件冒泡
-  stopPropagation() {
-    // 阻止事件冒泡
   }
 })

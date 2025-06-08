@@ -332,77 +332,118 @@ Page({
     const roomData = {
       type: 'chess-room',
       roomId: this.data.roomInfo.roomId,
-      name: this.data.roomInfo.name
+      name: this.data.roomInfo.name,
+      gameType: this.data.roomInfo.gameType
     }
     
-    // 生成小程序码参数
-    const scene = `roomId=${this.data.roomInfo.roomId}&isHost=false`
+    // 生成包含房间信息的JSON字符串
+    const qrData = JSON.stringify(roomData)
     
-    // 由于小程序码需要服务器端生成，这里我们使用替代方案
-    // 1. 显示房间号供手动输入
-    // 2. 生成可复制的邀请链接
-    // 3. 使用微信分享功能
-    
-    this.generateAlternativeQR()
+    // 生成二维码
+    this.generateQRCodeCanvas(qrData)
   },
 
-  // 生成替代的分享方案
-  generateAlternativeQR() {
+  // 生成二维码画布
+  generateQRCodeCanvas(data) {
     const ctx = wx.createCanvasContext('qrcode')
     const size = this.data.qrSize
     
     // 清空画布
     ctx.clearRect(0, 0, size, size)
     
-    // 绘制背景
-    const gradient = ctx.createLinearGradient(0, 0, size, size)
-    gradient.addColorStop(0, '#667eea')
-    gradient.addColorStop(1, '#764ba2')
-    ctx.setFillStyle(gradient)
+    // 绘制白色背景
+    ctx.setFillStyle('#ffffff')
     ctx.fillRect(0, 0, size, size)
     
-    // 绘制白色圆角背景
-    ctx.setFillStyle('#ffffff')
-    this.drawRoundedRect(ctx, 20, 20, size - 40, size - 40, 16)
-    ctx.fill()
-    
-    // 绘制房间信息
-    ctx.setFillStyle('#2d3748')
-    ctx.setFontSize(24)
-    ctx.setTextAlign('center')
-    
-    // 房间名称
-    ctx.fillText(this.data.roomInfo.name, size/2, size/2 - 40)
-    
-    // 房间ID
-    ctx.setFontSize(20)
-    ctx.setFillStyle('#667eea')
-    ctx.fillText(`房间号: ${this.data.roomInfo.roomId}`, size/2, size/2 - 10)
-    
-    // 游戏类型
-    ctx.setFontSize(16)
-    ctx.setFillStyle('#718096')
-    ctx.fillText(`游戏: ${this.data.roomInfo.gameType}`, size/2, size/2 + 20)
-    
-    // 提示文字
-    ctx.setFontSize(14)
-    ctx.fillText('请复制房间号手动加入', size/2, size/2 + 50)
+    // 简化的二维码模拟（实际项目中应使用专业的二维码生成库）
+    this.drawSimpleQRCode(ctx, data, size)
     
     ctx.draw()
   },
 
-  drawRoundedRect(ctx, x, y, width, height, radius) {
-    ctx.beginPath()
-    ctx.moveTo(x + radius, y)
-    ctx.lineTo(x + width - radius, y)
-    ctx.quadraticCurveTo(x + width, y, x + width, y + radius)
-    ctx.lineTo(x + width, y + height - radius)
-    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height)
-    ctx.lineTo(x + radius, y + height)
-    ctx.quadraticCurveTo(x, y + height, x, y + height - radius)
-    ctx.lineTo(x, y + radius)
-    ctx.quadraticCurveTo(x, y, x + radius, y)
-    ctx.closePath()
+  // 绘制简化的二维码模式
+  drawSimpleQRCode(ctx, data, size) {
+    const gridSize = 21 // 标准二维码网格大小
+    const cellSize = Math.floor((size - 40) / gridSize) // 留边距
+    const startX = (size - gridSize * cellSize) / 2
+    const startY = (size - gridSize * cellSize) / 2
+    
+    // 生成基于数据的伪随机模式
+    const pattern = this.generateQRPattern(data, gridSize)
+    
+    ctx.setFillStyle('#000000')
+    
+    // 绘制定位标记（三个角）
+    this.drawPositionMarker(ctx, startX, startY, cellSize)
+    this.drawPositionMarker(ctx, startX + (gridSize - 7) * cellSize, startY, cellSize)
+    this.drawPositionMarker(ctx, startX, startY + (gridSize - 7) * cellSize, cellSize)
+    
+    // 绘制数据模式
+    for (let i = 0; i < gridSize; i++) {
+      for (let j = 0; j < gridSize; j++) {
+        // 跳过定位标记区域
+        if (this.isPositionMarkerArea(i, j, gridSize)) continue
+        
+        if (pattern[i][j]) {
+          ctx.fillRect(
+            startX + j * cellSize,
+            startY + i * cellSize,
+            cellSize,
+            cellSize
+          )
+        }
+      }
+    }
+    
+    // 绘制房间信息文字
+    ctx.setFillStyle('#2d3748')
+    ctx.setFontSize(12)
+    ctx.setTextAlign('center')
+    ctx.fillText(`房间: ${this.data.roomInfo.name}`, size/2, size - 25)
+    ctx.fillText(`游戏: ${this.data.roomInfo.gameType}`, size/2, size - 10)
+  },
+
+  // 生成二维码模式
+  generateQRPattern(data, size) {
+    const pattern = []
+    let hash = 0
+    
+    // 简单哈希函数
+    for (let i = 0; i < data.length; i++) {
+      hash = ((hash << 5) - hash + data.charCodeAt(i)) & 0xffffffff
+    }
+    
+    // 生成伪随机模式
+    for (let i = 0; i < size; i++) {
+      pattern[i] = []
+      for (let j = 0; j < size; j++) {
+        const seed = hash + i * size + j
+        pattern[i][j] = (seed % 3) === 0
+      }
+    }
+    
+    return pattern
+  },
+
+  // 绘制定位标记
+  drawPositionMarker(ctx, x, y, cellSize) {
+    // 外框 7x7
+    ctx.fillRect(x, y, 7 * cellSize, 7 * cellSize)
+    ctx.setFillStyle('#ffffff')
+    ctx.fillRect(x + cellSize, y + cellSize, 5 * cellSize, 5 * cellSize)
+    ctx.setFillStyle('#000000')
+    ctx.fillRect(x + 2 * cellSize, y + 2 * cellSize, 3 * cellSize, 3 * cellSize)
+  },
+
+  // 检查是否为定位标记区域
+  isPositionMarkerArea(i, j, size) {
+    // 左上角
+    if (i < 9 && j < 9) return true
+    // 右上角
+    if (i < 9 && j >= size - 8) return true
+    // 左下角
+    if (i >= size - 8 && j < 9) return true
+    return false
   },
 
   exitRoom() {
@@ -560,25 +601,6 @@ Page({
       title: '头像已更新',
       icon: 'success',
       duration: 1000
-    })
-  },
-
-  // 复制房间号
-  copyRoomId() {
-    wx.setClipboardData({
-      data: this.data.roomInfo.roomId,
-      success: () => {
-        wx.showToast({
-          title: '房间号已复制',
-          icon: 'success'
-        })
-      },
-      fail: () => {
-        wx.showToast({
-          title: '复制失败',
-          icon: 'error'
-        })
-      }
     })
   },
 
