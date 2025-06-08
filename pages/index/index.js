@@ -197,10 +197,16 @@ Page({
     // 检查本地是否已存在该房间
     let existingRoom = wx.getStorageSync(`room_${roomData.roomId}`)
     
-    if (!existingRoom) {
-      // 如果本地不存在房间，说明这是通过分享链接进入的
-      // 需要创建一个基础房间结构，但不包含房主信息（房主信息应该由房主设备维护）
-      console.log('本地不存在房间，创建基础房间结构')
+    // 优先尝试从"云端"获取最新房间数据
+    const cloudRoomData = wx.getStorageSync(`cloud_room_${roomData.roomId}`)
+    
+    if (cloudRoomData) {
+      // 如果云端有数据，使用云端数据
+      console.log('使用云端房间数据')
+      existingRoom = cloudRoomData
+    } else if (!existingRoom) {
+      // 如果本地和云端都没有房间数据，使用分享数据创建基础房间结构
+      console.log('创建基础房间结构')
       existingRoom = {
         roomId: roomData.roomId,
         name: roomData.name || `${roomData.gameType || '棋牌'}房间`,
@@ -209,7 +215,8 @@ Page({
         initialScore: roomData.initialScore || 0,
         players: [], // 空的玩家列表，等待加入
         createTime: roomData.timestamp || Date.now(),
-        isSharedRoom: true // 标记这是通过分享创建的房间
+        isSharedRoom: true, // 标记这是通过分享创建的房间
+        syncVersion: 0 // 初始化同步版本
       }
       
       // 如果分享数据中包含房主信息，添加房主
@@ -224,10 +231,10 @@ Page({
         existingRoom.hostPlayerId = hostPlayer.playerId
         existingRoom.players.push(hostPlayer)
       }
-      
-      // 保存房间信息到本地
-      wx.setStorageSync(`room_${roomData.roomId}`, existingRoom)
     }
+    
+    // 保存房间信息到本地
+    wx.setStorageSync(`room_${roomData.roomId}`, existingRoom)
     
     wx.hideLoading()
     

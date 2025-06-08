@@ -1,5 +1,6 @@
 // room.js
 const app = getApp()
+const roomSync = require('../../utils/roomSync')
 
 Page({
   data: {
@@ -20,6 +21,11 @@ Page({
 
   onLoad(options) {
     this.initRoom(options)
+  },
+
+  onUnload() {
+    // 页面卸载时停止同步
+    roomSync.stopSync()
   },
 
   initRoom(options) {
@@ -52,6 +58,21 @@ Page({
 
     console.log('房间信息:', roomInfo)
     console.log('是否房主:', isHost)
+
+    // 初始化数据同步
+    const isHostBool = isHost === 'true'
+    roomSync.initSync(roomId, isHostBool)
+    
+    // 监听数据更新
+    roomSync.onDataUpdate((updatedRoomData) => {
+      console.log('收到房间数据更新:', updatedRoomData)
+      this.setData({
+        roomInfo: updatedRoomData
+      })
+      
+      // 更新计分历史
+      this.loadScoreHistory(roomId)
+    })
 
     // 如果不是房主，需要加入房间
     if (isHost === 'false') {
@@ -168,13 +189,17 @@ Page({
       ...userInfo,
       score: roomInfo.initialScore,
       isHost: false,
-      playerId: newPlayerId
+      playerId: newPlayerId,
+      joinTime: Date.now() // 添加加入时间
     }
     
     roomInfo.players.push(newPlayer)
     
     // 更新本地存储
     wx.setStorageSync(`room_${roomInfo.roomId}`, roomInfo)
+    
+    // 使用同步功能添加玩家
+    roomSync.addPlayer(newPlayer)
     
     // 更新当前玩家ID和房间信息
     this.setData({
@@ -322,6 +347,13 @@ Page({
     // 保存到本地存储
     wx.setStorageSync(`room_${roomInfo.roomId}`, roomInfo)
     wx.setStorageSync(`history_${roomInfo.roomId}`, newHistory)
+
+    // 使用同步功能更新玩家信息
+    roomSync.updatePlayer(currentPlayer.playerId, { score: currentPlayer.score })
+    roomSync.updatePlayer(targetPlayer.playerId, { score: targetPlayer.score })
+    
+    // 手动触发同步，确保分数更新及时传播
+    roomSync.forcSync()
 
     wx.showToast({
       title: '计分成功',
@@ -579,15 +611,17 @@ Page({
               content: '您是房主，退出后房间将被解散，确定继续吗？',
               success: (res2) => {
                 if (res2.confirm) {
-                  // 删除房间数据
-                  wx.removeStorageSync(`room_${this.data.roomInfo.roomId}`)
-                  wx.removeStorageSync(`history_${this.data.roomInfo.roomId}`)
+                  // 停止同步并清理房间数据
+                  roomSync.stopSync()
+                  roomSync.cleanupRoom(this.data.roomInfo.roomId)
                   
                   wx.navigateBack()
                 }
               }
             })
           } else {
+            // 客人退出，只停止同步
+            roomSync.stopSync()
             wx.navigateBack()
           }
         }
@@ -670,6 +704,15 @@ Page({
 
     // 保存到本地存储
     wx.setStorageSync(`room_${roomInfo.roomId}`, roomInfo)
+
+    // 使用同步功能更新玩家信息
+    roomSync.updatePlayer(currentPlayer.playerId, { 
+      nickName: nickName, 
+      avatarUrl: avatarUrl 
+    })
+    
+    // 手动触发同步，确保用户信息更新及时传播
+    roomSync.forcSync()
 
     wx.showToast({
       title: '修改成功',
