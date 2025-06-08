@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简化版 LOGO</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        canvas {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            margin: 20px;
+        }
+        
+        .download-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🎯 简化版 LOGO</h2>
+        <canvas id="simpleLogo" width="144" height="144"></canvas>
+        <br>
+        <button class="download-btn" onclick="downloadSimpleLogo()">下载简化版</button>
+    </div>
+
+    <script>
+        function drawSimpleLogo() {
+            const canvas = document.getElementById('simpleLogo');
+            const ctx = canvas.getContext('2d');
+            
+            // 清空画布
+            ctx.clearRect(0, 0, 144, 144);
+            
+            // 绘制圆形背景
+            const gradient = ctx.createRadialGradient(72, 72, 0, 72, 72, 72);
+            gradient.addColorStop(0, '#764ba2');
+            gradient.addColorStop(1, '#667eea');
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(72, 72, 66, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 绘制内圆
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.beginPath();
+            ctx.arc(72, 72, 50, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 绘制中心数字
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 32px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('123', 72, 68);
+            
+            // 绘制棋牌符号
+            ctx.font = 'bold 16px Arial';
+            ctx.fillText('♠♥♣♦', 72, 88);
+            
+            // 绘制文字
+            ctx.font = 'bold 12px Microsoft YaHei';
+            ctx.fillText('计分器', 72, 106);
+            
+            // 绘制装饰圆点
+            for (let i = 0; i < 8; i++) {
+                const angle = (i * Math.PI * 2) / 8;
+                const x = 72 + Math.cos(angle) * 55;
+                const y = 72 + Math.sin(angle) * 55;
+                
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                ctx.beginPath();
+                ctx.arc(x, y, 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        function downloadSimpleLogo() {
+            const canvas = document.getElementById('simpleLogo');
+            const link = document.createElement('a');
+            link.download = 'chess-scorer-logo-simple.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        window.onload = function() {
+            drawSimpleLogo();
+        };
+    </script>
+</body>
+</html>

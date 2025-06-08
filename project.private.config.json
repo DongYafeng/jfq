@@ -1,6 +1,6 @@
 {
   "libVersion": "3.8.7",
-  "projectname": "%E6%A3%8B%E7%89%8C%E8%AE%A1%E5%88%86%E5%99%A8",
+  "projectname": "jfq",
   "setting": {
     "urlCheck": true,
     "coverView": true,
@@ -9,6 +9,16 @@
     "preloadBackgroundData": false,
     "autoAudits": false,
     "showShadowRootInWxmlPanel": true,
-    "compileHotReLoad": true
-  }
+    "compileHotReLoad": true,
+    "useApiHook": true,
+    "useApiHostProcess": true,
+    "useStaticServer": false,
+    "useLanDebug": false,
+    "showES6CompileOption": false,
+    "checkInvalidKey": true,
+    "ignoreDevUnusedFiles": true,
+    "bigPackageSizeSupport": false,
+    "useIsolateContext": true
+  },
+  "condition": {}
 }

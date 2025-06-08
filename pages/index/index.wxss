@@ -161,63 +161,6 @@
   transition: all 0.3s ease;
 }
 
-.decoration {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.floating-card {
-  position: absolute;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 16rpx;
-  backdrop-filter: blur(10px);
-  border: 1rpx solid rgba(255, 255, 255, 0.1);
-}
-
-.card-1 {
-  width: 120rpx;
-  height: 80rpx;
-  top: 20%;
-  right: 10%;
-  animation: float-1 6s ease-in-out infinite;
-}
-
-.card-2 {
-  width: 80rpx;
-  height: 120rpx;
-  top: 60%;
-  left: 8%;
-  animation: float-2 8s ease-in-out infinite;
-}
-
-.card-3 {
-  width: 100rpx;
-  height: 100rpx;
-  bottom: 20%;
-  right: 15%;
-  animation: float-3 7s ease-in-out infinite;
-}
-
-@keyframes float-1 {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-20rpx) rotate(5deg); }
-}
-
-@keyframes float-2 {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-30rpx) rotate(-3deg); }
-}
-
-@keyframes float-3 {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-25rpx) rotate(4deg); }
-}
-
 /* 手动加入房间弹窗样式 */
 .modal-overlay {
   position: fixed;

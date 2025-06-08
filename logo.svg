@@ -1,0 +1,59 @@
+<svg width="144" height="144" viewBox="0 0 144 144" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="cardGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.95" />
+      <stop offset="100%" style="stop-color:#f8fafc;stop-opacity:0.95" />
+    </linearGradient>
+  </defs>
+  
+  <!-- 背景圆角矩形 -->
+  <rect x="8" y="8" width="128" height="128" rx="24" ry="24" fill="url(#bgGradient)"/>
+  
+  <!-- 计算器主体 -->
+  <rect x="28" y="24" width="88" height="96" rx="8" ry="8" fill="url(#cardGradient)" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+  
+  <!-- 显示屏 -->
+  <rect x="36" y="32" width="72" height="20" rx="4" ry="4" fill="#2d3748"/>
+  
+  <!-- 显示屏文字 -->
+  <text x="72" y="46" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#4ade80" text-anchor="middle">1000</text>
+  
+  <!-- 按钮网格 -->
+  <!-- 第一行 -->
+  <rect x="40" y="60" width="14" height="12" rx="2" ry="2" fill="#667eea"/>
+  <rect x="58" y="60" width="14" height="12" rx="2" ry="2" fill="#667eea"/>
+  <rect x="76" y="60" width="14" height="12" rx="2" ry="2" fill="#667eea"/>
+  <rect x="94" y="60" width="14" height="12" rx="2" ry="2" fill="#f56565"/>
+  
+  <!-- 第二行 -->
+  <rect x="40" y="76" width="14" height="12" rx="2" ry="2" fill="#e2e8f0"/>
+  <rect x="58" y="76" width="14" height="12" rx="2" ry="2" fill="#e2e8f0"/>
+  <rect x="76" y="76" width="14" height="12" rx="2" ry="2" fill="#e2e8f0"/>
+  <rect x="94" y="76" width="14" height="12" rx="2" ry="2" fill="#f56565"/>
+  
+  <!-- 第三行 -->
+  <rect x="40" y="92" width="14" height="12" rx="2" ry="2" fill="#e2e8f0"/>
+  <rect x="58" y="92" width="14" height="12" rx="2" ry="2" fill="#e2e8f0"/>
+  <rect x="76" y="92" width="14" height="12" rx="2" ry="2" fill="#e2e8f0"/>
+  <rect x="94" y="92" width="14" height="12" rx="2" ry="2" fill="#48bb78"/>
+  
+  <!-- 第四行 -->
+  <rect x="40" y="108" width="32" height="8" rx="2" ry="2" fill="#e2e8f0"/>
+  <rect x="76" y="108" width="14" height="8" rx="2" ry="2" fill="#e2e8f0"/>
+  <rect x="94" y="108" width="14" height="8" rx="2" ry="2" fill="#48bb78"/>
+  
+  <!-- 棋牌元素装饰 -->
+  <circle cx="108" cy="36" r="8" fill="#f56565"/>
+  <text x="108" y="40" font-family="Arial, sans-serif" font-size="8" font-weight="bold" fill="white" text-anchor="middle">♠</text>
+  
+  <!-- 底部标题 -->
+  <text x="72" y="134" font-family="Microsoft YaHei, Arial, sans-serif" font-size="14" font-weight="bold" fill="white" text-anchor="middle">计分</text>
+  
+  <!-- 装饰性光效 -->
+  <circle cx="24" cy="24" r="3" fill="rgba(255,255,255,0.4)"/>
+  <circle cx="120" cy="120" r="2" fill="rgba(255,255,255,0.3)"/>
+</svg>

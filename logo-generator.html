@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>棋牌计分器 LOGO 生成器</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+        }
+        
+        h1 {
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .logo-preview {
+            margin: 30px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        
+        canvas {
+            border: 3px solid #e2e8f0;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            background: white;
+        }
+        
+        .download-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .specs {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .specs h3 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .specs ul {
+            color: #4a5568;
+            line-height: 1.8;
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .success-msg {
+            background: #f0fff4;
+            border: 2px solid #68d391;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #2f855a;
+            font-weight: 600;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 棋牌计分器 LOGO</h1>
+        
+        <div class="specs">
+            <h3>📋 技术规格</h3>
+            <ul>
+                <li><strong>尺寸：</strong>144px × 144px（微信小程序标准）</li>
+                <li><strong>格式：</strong>PNG（透明背景支持）</li>
+                <li><strong>文件大小：</strong>&lt; 50KB（远小于2MB限制）</li>
+                <li><strong>设计风格：</strong>现代简约，渐变配色</li>
+                <li><strong>主要元素：</strong>计算器 + 棋牌符号 + 计分文字</li>
+            </ul>
+        </div>
+        
+        <div class="logo-preview">
+            <canvas id="logoCanvas" width="144" height="144"></canvas>
+            
+            <button class="download-btn" onclick="downloadLogo()">
+                📥 下载 PNG 格式 LOGO
+            </button>
+            
+            <button class="download-btn" onclick="generateNewLogo()" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">
+                🔄 重新生成
+            </button>
+        </div>
+        
+        <div class="success-msg" id="successMsg">
+            ✅ LOGO已成功下载！文件名：chess-scorer-logo.png
+        </div>
+        
+        <div class="specs">
+            <h3>🎨 设计说明</h3>
+            <ul>
+                <li><strong>背景：</strong>紫蓝渐变，体现科技感和专业性</li>
+                <li><strong>主图标：</strong>计算器造型，突出计分功能</li>
+                <li><strong>装饰元素：</strong>红桃黑桃符号，体现棋牌属性</li>
+                <li><strong>文字：</strong>"计分"二字，简洁明了</li>
+                <li><strong>色彩搭配：</strong>高对比度，确保在各种背景下清晰可见</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // 绘制LOGO
+        function drawLogo() {
+            const canvas = document.getElementById('logoCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // 清空画布
+            ctx.clearRect(0, 0, 144, 144);
+            
+            // 绘制渐变背景
+            const gradient = ctx.createLinearGradient(0, 0, 144, 144);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            
+            // 绘制圆角矩形背景
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            roundRect(ctx, 8, 8, 128, 128, 24);
+            ctx.fill();
+            
+            // 绘制计算器主体
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+            ctx.beginPath();
+            roundRect(ctx, 28, 24, 88, 96, 8);
+            ctx.fill();
+            
+            // 绘制显示屏
+            ctx.fillStyle = '#2d3748';
+            ctx.beginPath();
+            roundRect(ctx, 36, 32, 72, 20, 4);
+            ctx.fill();
+            
+            // 绘制显示屏文字
+            ctx.fillStyle = '#4ade80';
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('1000', 72, 46);
+            
+            // 绘制按钮网格
+            const buttons = [
+                // 第一行 - 功能按钮
+                {x: 40, y: 60, w: 14, h: 12, color: '#667eea'},
+                {x: 58, y: 60, w: 14, h: 12, color: '#667eea'},
+                {x: 76, y: 60, w: 14, h: 12, color: '#667eea'},
+                {x: 94, y: 60, w: 14, h: 12, color: '#f56565'},
+                
+                // 第二行
+                {x: 40, y: 76, w: 14, h: 12, color: '#e2e8f0'},
+                {x: 58, y: 76, w: 14, h: 12, color: '#e2e8f0'},
+                {x: 76, y: 76, w: 14, h: 12, color: '#e2e8f0'},
+                {x: 94, y: 76, w: 14, h: 12, color: '#f56565'},
+                
+                // 第三行
+                {x: 40, y: 92, w: 14, h: 12, color: '#e2e8f0'},
+                {x: 58, y: 92, w: 14, h: 12, color: '#e2e8f0'},
+                {x: 76, y: 92, w: 14, h: 12, color: '#e2e8f0'},
+                {x: 94, y: 92, w: 14, h: 12, color: '#48bb78'},
+                
+                // 第四行
+                {x: 40, y: 108, w: 32, h: 8, color: '#e2e8f0'},
+                {x: 76, y: 108, w: 14, h: 8, color: '#e2e8f0'},
+                {x: 94, y: 108, w: 14, h: 8, color: '#48bb78'},
+            ];
+            
+            buttons.forEach(btn => {
+                ctx.fillStyle = btn.color;
+                ctx.beginPath();
+                roundRect(ctx, btn.x, btn.y, btn.w, btn.h, 2);
+                ctx.fill();
+            });
+            
+            // 绘制棋牌装饰元素
+            ctx.fillStyle = '#f56565';
+            ctx.beginPath();
+            ctx.arc(108, 36, 8, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 10px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('♠', 108, 41);
+            
+            // 绘制底部文字
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 14px Microsoft YaHei, Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('计分', 72, 134);
+            
+            // 绘制装饰光效
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.beginPath();
+            ctx.arc(24, 24, 3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.beginPath();
+            ctx.arc(120, 120, 2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 添加微妙的边框高光
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            roundRect(ctx, 8.5, 8.5, 127, 127, 24);
+            ctx.stroke();
+        }
+        
+        // 圆角矩形绘制函数
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
+        
+        // 下载LOGO
+        function downloadLogo() {
+            const canvas = document.getElementById('logoCanvas');
+            const link = document.createElement('a');
+            link.download = 'chess-scorer-logo.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            
+            // 显示成功消息
+            const successMsg = document.getElementById('successMsg');
+            successMsg.style.display = 'block';
+            setTimeout(() => {
+                successMsg.style.display = 'none';
+            }, 3000);
+        }
+        
+        // 重新生成LOGO
+        function generateNewLogo() {
+            drawLogo();
+        }
+        
+        // 页面加载完成后绘制LOGO
+        window.onload = function() {
+            drawLogo();
+        };
+    </script>
+</body>
+</html>

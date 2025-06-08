@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>精品圆形LOGO - 棋牌计分器</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 24px;
+            padding: 50px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            text-align: center;
+            max-width: 600px;
+        }
+        
+        h1 {
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-size: 32px;
+            font-weight: 700;
+        }
+        
+        .logo-showcase {
+            margin: 40px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        
+        canvas {
+            border: 4px solid #f7fafc;
+            border-radius: 50%;
+            box-shadow: 
+                0 0 0 1px rgba(102, 126, 234, 0.1),
+                0 15px 35px rgba(0,0,0,0.1),
+                0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+            background: transparent;
+            transition: transform 0.3s ease;
+        }
+        
+        canvas:hover {
+            transform: scale(1.05);
+        }
+        
+        .download-section {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+        
+        .download-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .download-btn.secondary {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+        }
+        
+        .download-btn.secondary:hover {
+            box-shadow: 0 8px 25px rgba(72, 187, 120, 0.4);
+        }
+        
+        .specs {
+            background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
+            border-radius: 16px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: left;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .specs h3 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 20px;
+        }
+        
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .spec-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .spec-item strong {
+            color: #2d3748;
+        }
+        
+        .spec-item span {
+            color: #4a5568;
+        }
+        
+        .success-msg {
+            background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+            border: 2px solid #68d391;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #2f855a;
+            font-weight: 600;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .feature-list {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .feature-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+        
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .feature-list li::before {
+            content: "✨";
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 精品圆形LOGO</h1>
+        
+        <div class="specs">
+            <h3>📋 设计规格</h3>
+            <div class="specs-grid">
+                <div class="spec-item">
+                    <strong>尺寸：</strong><br>
+                    <span>144px × 144px 圆形</span>
+                </div>
+                <div class="spec-item">
+                    <strong>格式：</strong><br>
+                    <span>PNG（透明背景）</span>
+                </div>
+                <div class="spec-item">
+                    <strong>文件大小：</strong><br>
+                    <span>&lt; 50KB</span>
+                </div>
+                <div class="spec-item">
+                    <strong>设计风格：</strong><br>
+                    <span>现代简约，渐变配色</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="logo-showcase">
+            <canvas id="premiumLogo" width="144" height="144"></canvas>
+            
+            <div class="download-section">
+                <button class="download-btn" onclick="downloadPremiumLogo()">
+                    📥 下载精品LOGO
+                </button>
+                <button class="download-btn secondary" onclick="regenerateLogo()">
+                    🔄 重新生成
+                </button>
+            </div>
+        </div>
+        
+        <div class="success-msg" id="successMsg">
+            ✅ LOGO已成功下载！文件名：chess-scorer-premium-circle.png
+        </div>
+        
+        <div class="feature-list">
+            <h3 style="text-align: center; color: #2d3748; margin-bottom: 20px;">🎨 设计特色</h3>
+            <ul>
+                <li><strong>完美圆形：</strong>严格按照144×144像素圆形设计，完美适配微信小程序</li>
+                <li><strong>渐变背景：</strong>径向渐变从中心向外，营造立体视觉效果</li>
+                <li><strong>计算器元素：</strong>精简的计算器图标，突出计分核心功能</li>
+                <li><strong>棋牌符号：</strong>四种花色符号分布四角，体现棋牌游戏属性</li>
+                <li><strong>透明支持：</strong>PNG格式透明背景，适应各种应用场景</li>
+                <li><strong>高对比度：</strong>白色元素在深色背景上清晰醒目</li>
+                <li><strong>现代简约：</strong>去除冗余元素，保持设计简洁现代</li>
+                <li><strong>品质保证：</strong>文件大小优化，加载速度快</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function drawPremiumLogo() {
+            const canvas = document.getElementById('premiumLogo');
+            const ctx = canvas.getContext('2d');
+            
+            // 清空画布
+            ctx.clearRect(0, 0, 144, 144);
+            
+            // 绘制主圆形渐变背景
+            const mainGradient = ctx.createRadialGradient(72, 72, 0, 72, 72, 72);
+            mainGradient.addColorStop(0, '#8b5cf6');
+            mainGradient.addColorStop(0.4, '#667eea');
+            mainGradient.addColorStop(0.8, '#764ba2');
+            mainGradient.addColorStop(1, '#5a67d8');
+            
+            ctx.fillStyle = mainGradient;
+            ctx.beginPath();
+            ctx.arc(72, 72, 72, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 绘制内层光晕
+            const innerGradient = ctx.createRadialGradient(72, 72, 0, 72, 72, 50);
+            innerGradient.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
+            innerGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            
+            ctx.fillStyle = innerGradient;
+            ctx.beginPath();
+            ctx.arc(72, 72, 50, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 绘制中心计算器区域
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+            ctx.beginPath();
+            ctx.arc(72, 72, 32, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 绘制计算器显示屏
+            ctx.fillStyle = '#1a202c';
+            ctx.beginPath();
+            roundRect(ctx, 58, 58, 28, 8, 2);
+            ctx.fill();
+            
+            // 绘制显示屏数字
+            ctx.fillStyle = '#48bb78';
+            ctx.font = 'bold 6px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('1000', 72, 64);
+            
+            // 绘制计算器按钮网格
+            const buttonSize = 4;
+            const buttonGap = 2;
+            const startX = 60;
+            const startY = 70;
+            
+            const buttonColors = [
+                ['#667eea', '#667eea', '#f56565'],
+                ['#e2e8f0', '#e2e8f0', '#48bb78'],
+                ['#e2e8f0', '#e2e8f0', '#48bb78']
+            ];
+            
+            for (let row = 0; row < 3; row++) {
+                for (let col = 0; col < 3; col++) {
+                    ctx.fillStyle = buttonColors[row][col];
+                    ctx.beginPath();
+                    roundRect(ctx, 
+                        startX + col * (buttonSize + buttonGap),
+                        startY + row * (buttonSize + buttonGap),
+                        buttonSize,
+                        buttonSize,
+                        1
+                    );
+                    ctx.fill();
+                }
+            }
+            
+            // 绘制四个角的棋牌符号
+            const suits = [
+                {symbol: '♠', color: '#2d3748', x: 36, y: 36},
+                {symbol: '♥', color: '#e53e3e', x: 108, y: 36},
+                {symbol: '♣', color: '#2d3748', x: 36, y: 108},
+                {symbol: '♦', color: '#e53e3e', x: 108, y: 108}
+            ];
+            
+            suits.forEach(suit => {
+                // 绘制符号背景圆
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                ctx.beginPath();
+                ctx.arc(suit.x, suit.y, 10, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // 绘制符号
+                ctx.fillStyle = suit.color;
+                ctx.font = 'bold 10px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(suit.symbol, suit.x, suit.y + 3);
+            });
+            
+            // 绘制底部文字
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 9px Microsoft YaHei, Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('计分器', 72, 120);
+            
+            // 绘制装饰性光点
+            const lightPoints = [
+                {x: 50, y: 50, size: 1.5, opacity: 0.6},
+                {x: 94, y: 50, size: 1, opacity: 0.4},
+                {x: 50, y: 94, size: 1, opacity: 0.4},
+                {x: 94, y: 94, size: 1.5, opacity: 0.6}
+            ];
+            
+            lightPoints.forEach(point => {
+                ctx.fillStyle = `rgba(255, 255, 255, ${point.opacity})`;
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, point.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            
+            // 绘制外圈装饰点
+            for (let i = 0; i < 16; i++) {
+                const angle = (i * Math.PI * 2) / 16;
+                const x = 72 + Math.cos(angle) * 65;
+                const y = 72 + Math.sin(angle) * 65;
+                
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.beginPath();
+                ctx.arc(x, y, 1, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        // 圆角矩形绘制函数
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
+        
+        // 下载精品LOGO
+        function downloadPremiumLogo() {
+            const canvas = document.getElementById('premiumLogo');
+            const link = document.createElement('a');
+            link.download = 'chess-scorer-premium-circle.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            
+            // 显示成功消息
+            const successMsg = document.getElementById('successMsg');
+            successMsg.style.display = 'block';
+            setTimeout(() => {
+                successMsg.style.display = 'none';
+            }, 4000);
+        }
+        
+        // 重新生成LOGO
+        function regenerateLogo() {
+            drawPremiumLogo();
+        }
+        
+        // 页面加载完成后绘制LOGO
+        window.onload = function() {
+            drawPremiumLogo();
+        };
+    </script>
+</body>
+</html>

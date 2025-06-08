@@ -36,11 +36,4 @@
       </view>
     </view>
   </view>
-
-  <!-- 装饰元素 -->
-  <view class="decoration">
-    <view class="floating-card card-1"></view>
-    <view class="floating-card card-2"></view>
-    <view class="floating-card card-3"></view>
-  </view>
 </view>
