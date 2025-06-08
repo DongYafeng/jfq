@@ -104,9 +104,12 @@
       <view class="room-info-card">
         <view class="room-card-header">
           <text class="room-card-name">{{roomInfo.name}}</text>
-          <text class="room-card-type">{{roomInfo.gameType}}</text>
         </view>
         <view class="room-card-details">
+          <view class="room-detail-item">
+            <text class="detail-label">游戏类型</text>
+            <text class="detail-value">{{roomInfo.gameType}}</text>
+          </view>
           <view class="room-detail-item">
             <text class="detail-label">当前人数</text>
             <text class="detail-value">{{roomInfo.players.length}}/{{roomInfo.maxPlayers}}</text>
