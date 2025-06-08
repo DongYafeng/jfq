@@ -327,6 +327,7 @@ Page({
     })
   },
 
+  // 生成小程序码（真正的二维码）
   generateQRCode() {
     const roomData = {
       type: 'chess-room',
@@ -334,28 +335,58 @@ Page({
       name: this.data.roomInfo.name
     }
     
-    // 生成二维码内容
-    const qrContent = JSON.stringify(roomData)
+    // 生成小程序码参数
+    const scene = `roomId=${this.data.roomInfo.roomId}&isHost=false`
     
-    // 使用Canvas绘制二维码（简化处理，显示房间信息）
+    // 由于小程序码需要服务器端生成，这里我们使用替代方案
+    // 1. 显示房间号供手动输入
+    // 2. 生成可复制的邀请链接
+    // 3. 使用微信分享功能
+    
+    this.generateAlternativeQR()
+  },
+
+  // 生成替代的分享方案
+  generateAlternativeQR() {
     const ctx = wx.createCanvasContext('qrcode')
     const size = this.data.qrSize
     
-    // 绘制渐变背景
+    // 清空画布
+    ctx.clearRect(0, 0, size, size)
+    
+    // 绘制背景
     const gradient = ctx.createLinearGradient(0, 0, size, size)
-    gradient.addColorStop(0, '#f8fafc')
-    gradient.addColorStop(1, '#e2e8f0')
+    gradient.addColorStop(0, '#667eea')
+    gradient.addColorStop(1, '#764ba2')
     ctx.setFillStyle(gradient)
     ctx.fillRect(0, 0, size, size)
     
-    // 绘制圆角边框
-    ctx.setStrokeStyle('#cbd5e0')
-    ctx.setLineWidth(3)
-    this.drawRoundedRect(ctx, 2, 2, size - 4, size - 4, 12)
-    ctx.stroke()
+    // 绘制白色圆角背景
+    ctx.setFillStyle('#ffffff')
+    this.drawRoundedRect(ctx, 20, 20, size - 40, size - 40, 16)
+    ctx.fill()
     
-    // 绘制二维码模拟图案（简化版）
-    this.drawSimpleQR(ctx, size)
+    // 绘制房间信息
+    ctx.setFillStyle('#2d3748')
+    ctx.setFontSize(24)
+    ctx.setTextAlign('center')
+    
+    // 房间名称
+    ctx.fillText(this.data.roomInfo.name, size/2, size/2 - 40)
+    
+    // 房间ID
+    ctx.setFontSize(20)
+    ctx.setFillStyle('#667eea')
+    ctx.fillText(`房间号: ${this.data.roomInfo.roomId}`, size/2, size/2 - 10)
+    
+    // 游戏类型
+    ctx.setFontSize(16)
+    ctx.setFillStyle('#718096')
+    ctx.fillText(`游戏: ${this.data.roomInfo.gameType}`, size/2, size/2 + 20)
+    
+    // 提示文字
+    ctx.setFontSize(14)
+    ctx.fillText('请复制房间号手动加入', size/2, size/2 + 50)
     
     ctx.draw()
   },
@@ -372,106 +403,6 @@ Page({
     ctx.lineTo(x, y + radius)
     ctx.quadraticCurveTo(x, y, x + radius, y)
     ctx.closePath()
-  },
-
-  drawSimpleQR(ctx, size) {
-    const blockSize = 8
-    const blocks = Math.floor(size / blockSize)
-    const margin = 16 // 增加边距
-    
-    // 创建渐变色
-    const gradient = ctx.createLinearGradient(0, 0, size, size)
-    gradient.addColorStop(0, '#667eea')
-    gradient.addColorStop(0.5, '#764ba2')
-    gradient.addColorStop(1, '#667eea')
-    
-    // 绘制三个定位正方形（使用渐变色）
-    this.drawPositionSquare(ctx, margin, margin, blockSize * 6, gradient)
-    this.drawPositionSquare(ctx, size - margin - blockSize * 6, margin, blockSize * 6, gradient)
-    this.drawPositionSquare(ctx, margin, size - margin - blockSize * 6, blockSize * 6, gradient)
-    
-    // 绘制中心装饰图案
-    this.drawCenterPattern(ctx, size, gradient)
-    
-    // 绘制随机数据点（使用渐变色）
-    ctx.setFillStyle(gradient)
-    for (let i = 0; i < blocks; i++) {
-      for (let j = 0; j < blocks; j++) {
-        const x = i * blockSize
-        const y = j * blockSize
-        
-        // 跳过定位区域和中心区域
-        if ((x < margin + blockSize * 7 && y < margin + blockSize * 7) || 
-            (x > size - margin - blockSize * 8 && y < margin + blockSize * 7) || 
-            (x < margin + blockSize * 7 && y > size - margin - blockSize * 8) ||
-            (x > size/2 - blockSize * 3 && x < size/2 + blockSize * 3 && 
-             y > size/2 - blockSize * 3 && y < size/2 + blockSize * 3)) {
-          continue
-        }
-        
-        if (Math.random() > 0.4) {
-          // 绘制圆角方块
-          this.drawRoundedBlock(ctx, x, y, blockSize - 2, 2)
-        }
-      }
-    }
-  },
-
-  drawRoundedBlock(ctx, x, y, size, radius) {
-    ctx.beginPath()
-    ctx.moveTo(x + radius, y)
-    ctx.lineTo(x + size - radius, y)
-    ctx.quadraticCurveTo(x + size, y, x + size, y + radius)
-    ctx.lineTo(x + size, y + size - radius)
-    ctx.quadraticCurveTo(x + size, y + size, x + size - radius, y + size)
-    ctx.lineTo(x + radius, y + size)
-    ctx.quadraticCurveTo(x, y + size, x, y + size - radius)
-    ctx.lineTo(x, y + radius)
-    ctx.quadraticCurveTo(x, y, x + radius, y)
-    ctx.closePath()
-    ctx.fill()
-  },
-
-  drawCenterPattern(ctx, size, gradient) {
-    const centerX = size / 2
-    const centerY = size / 2
-    const patternSize = 32
-    
-    ctx.setFillStyle(gradient)
-    
-    // 绘制中心装饰圆形
-    ctx.beginPath()
-    ctx.arc(centerX, centerY, patternSize / 2, 0, 2 * Math.PI)
-    ctx.fill()
-    
-    // 绘制内部白色圆形
-    ctx.setFillStyle('#ffffff')
-    ctx.beginPath()
-    ctx.arc(centerX, centerY, patternSize / 3, 0, 2 * Math.PI)
-    ctx.fill()
-    
-    // 绘制中心小圆点
-    ctx.setFillStyle(gradient)
-    ctx.beginPath()
-    ctx.arc(centerX, centerY, patternSize / 6, 0, 2 * Math.PI)
-    ctx.fill()
-  },
-
-  drawPositionSquare(ctx, x, y, size, gradient) {
-    ctx.setFillStyle(gradient)
-    
-    // 外框（圆角）
-    this.drawRoundedBlock(ctx, x, y, size, 4)
-    
-    // 内部白色区域
-    ctx.setFillStyle('#ffffff')
-    const innerMargin = size / 6
-    this.drawRoundedBlock(ctx, x + innerMargin, y + innerMargin, size - 2 * innerMargin, 2)
-    
-    // 中心方块
-    ctx.setFillStyle(gradient)
-    const centerMargin = size / 3
-    this.drawRoundedBlock(ctx, x + centerMargin, y + centerMargin, size - 2 * centerMargin, 2)
   },
 
   exitRoom() {
@@ -630,5 +561,56 @@ Page({
       icon: 'success',
       duration: 1000
     })
+  },
+
+  // 复制房间号
+  copyRoomId() {
+    wx.setClipboardData({
+      data: this.data.roomInfo.roomId,
+      success: () => {
+        wx.showToast({
+          title: '房间号已复制',
+          icon: 'success'
+        })
+      },
+      fail: () => {
+        wx.showToast({
+          title: '复制失败',
+          icon: 'error'
+        })
+      }
+    })
+  },
+
+  // 分享给好友
+  shareToFriend() {
+    wx.showShareMenu({
+      withShareTicket: true,
+      menus: ['shareAppMessage', 'shareTimeline']
+    })
+    
+    wx.showToast({
+      title: '请点击右上角分享',
+      icon: 'none',
+      duration: 2000
+    })
+  },
+
+  // 页面分享配置
+  onShareAppMessage() {
+    return {
+      title: `邀请你加入${this.data.roomInfo.name}`,
+      path: `/pages/room/room?roomId=${this.data.roomInfo.roomId}&isHost=false`,
+      imageUrl: '' // 可以添加分享图片
+    }
+  },
+
+  // 分享到朋友圈
+  onShareTimeline() {
+    return {
+      title: `${this.data.roomInfo.name} - 棋牌计分器`,
+      query: `roomId=${this.data.roomInfo.roomId}&isHost=false`,
+      imageUrl: '' // 可以添加分享图片
+    }
   },
 })

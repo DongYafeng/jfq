@@ -93,23 +93,63 @@
 <view wx:if="{{showShareModal}}" class="modal-overlay" bindtap="closeShareModal">
   <view class="share-modal" catchtap="stopPropagation">
     <view class="modal-header">
-      <text class="modal-title">分享房间</text>
+      <text class="modal-title">邀请好友</text>
       <button class="modal-close" bindtap="closeShareModal">×</button>
     </view>
     
     <view class="share-content">
-      <view class="qr-container">
-        <canvas 
-          canvas-id="qrcode" 
-          class="qr-canvas"
-          style="width: {{qrSize}}px; height: {{qrSize}}px;"
-        ></canvas>
+      <!-- 房间信息卡片 -->
+      <view class="room-info-card">
+        <view class="room-card-header">
+          <text class="room-card-name">{{roomInfo.name}}</text>
+          <text class="room-card-type">{{roomInfo.gameType}}</text>
+        </view>
+        <view class="room-card-details">
+          <view class="room-detail-item">
+            <text class="detail-label">房间号</text>
+            <text class="detail-value">{{roomInfo.roomId}}</text>
+          </view>
+          <view class="room-detail-item">
+            <text class="detail-label">人数</text>
+            <text class="detail-value">{{roomInfo.players.length}}/{{roomInfo.maxPlayers}}</text>
+          </view>
+        </view>
       </view>
-      
-      <view class="room-share-info">
-        <text class="share-room-name">{{roomInfo.name}}</text>
-        <text class="share-room-id">房间ID: {{roomInfo.roomId}}</text>
-        <text class="share-hint">请其他玩家扫描二维码加入房间</text>
+
+      <!-- 分享方式选择 -->
+      <view class="share-methods">
+        <view class="share-method-item" bindtap="copyRoomId">
+          <view class="method-icon copy-icon">
+            <text class="icon-text">📋</text>
+          </view>
+          <view class="method-content">
+            <text class="method-title">复制房间号</text>
+            <text class="method-desc">复制房间号发给好友</text>
+          </view>
+        </view>
+
+        <view class="share-method-item" bindtap="shareToFriend">
+          <view class="method-icon share-icon">
+            <text class="icon-text">💬</text>
+          </view>
+          <view class="method-content">
+            <text class="method-title">微信分享</text>
+            <text class="method-desc">分享给微信好友或群</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 二维码展示区域 -->
+      <view class="qr-section">
+        <text class="qr-title">房间信息</text>
+        <view class="qr-container">
+          <canvas 
+            canvas-id="qrcode" 
+            class="qr-canvas"
+            style="width: {{qrSize}}px; height: {{qrSize}}px;"
+          ></canvas>
+        </view>
+        <text class="qr-hint">好友可以复制房间号手动加入</text>
       </view>
     </view>
     

@@ -3,6 +3,8 @@ const app = getApp()
 
 Page({
   data: {
+    showJoinModal: false,
+    roomIdInput: ''
   },
 
   onLoad() {
@@ -53,5 +55,65 @@ Page({
         }
       }
     })
+  },
+
+  // 显示手动加入弹窗
+  showJoinRoomModal() {
+    this.setData({
+      showJoinModal: true,
+      roomIdInput: ''
+    })
+  },
+
+  // 关闭手动加入弹窗
+  closeJoinModal() {
+    this.setData({
+      showJoinModal: false,
+      roomIdInput: ''
+    })
+  },
+
+  // 输入房间号
+  onRoomIdInput(e) {
+    this.setData({
+      roomIdInput: e.detail.value
+    })
+  },
+
+  // 确认加入房间
+  confirmJoinRoom() {
+    const roomId = this.data.roomIdInput.trim()
+    
+    if (!roomId) {
+      wx.showToast({
+        title: '请输入房间号',
+        icon: 'error'
+      })
+      return
+    }
+
+    // 检查房间是否存在
+    const roomInfo = wx.getStorageSync(`room_${roomId}`)
+    
+    if (!roomInfo) {
+      wx.showToast({
+        title: '房间不存在',
+        icon: 'error'
+      })
+      return
+    }
+
+    // 关闭弹窗
+    this.closeJoinModal()
+
+    // 跳转到房间页面
+    wx.navigateTo({
+      url: `/pages/room/room?roomId=${roomId}&isHost=false`
+    })
+  },
+
+  // 阻止事件冒泡
+  stopPropagation() {
+    // 阻止事件冒泡
   }
 })
